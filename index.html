@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào Xuân Đinh Mùi 2027 - Mừng Tết Nguyên Đán</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Gọi file CSS riêng -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-yellow-500 selection:text-red-950">
+
+    <canvas id="fireworksCanvas"></canvas>
+
+    <div id="homeSection" class="w-full flex flex-col min-h-screen justify-between relative z-20">
+        <!-- POPUP THÔNG BÁO -->
+        <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+            <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
+                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
+                    <i id="modalIcon" class="fa-solid fa-bell text-yellow-300"></i>
+                </div>
+                <h3 id="modalTitle" class="font-serif text-xl font-bold text-yellow-300 mb-2">Thông Báo</h3>
+                <p id="modalMessage" class="text-xs text-red-100 mb-5 leading-relaxed">Nội dung...</p>
+                <button id="modalCloseBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">Đã Hiểu</button>
+            </div>
+        </div>
+
+        <!-- POPUP NĂN NỈ CUTE (Link4M) -->
+        <div id="cutePopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+            <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
+                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
+                    <i class="fa-solid fa-face-pleading text-yellow-300 animate-bounce"></i>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-yellow-300 mb-2">Gửi Các Anh Đẹp Trai!</h3>
+                <p class="text-xs text-red-200 mb-5 leading-relaxed">
+                    Các anh đẹp trai có thể bấm ủng hộ em <span class="text-yellow-300 font-bold">1 lần thui</span> được không ạ? Đi mà, giúp em đi mà... 🥺🙏
+                </p>
+                <div class="space-y-2">
+                    <button id="popupAcceptBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">
+                        <i class="fa-solid fa-heart mr-1"></i> Bấm Ủng Hộ Ngay (Link4M)
+                    </button>
+                    <button id="popupCloseBtn" class="w-full py-2.5 bg-red-950/80 text-red-300 hover:text-white font-semibold rounded-xl text-xs border border-red-500/30 transition cursor-pointer">
+                        Thôi để sau (Đóng)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thanh điều hướng góc phải -->
+        <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
+            <div id="authStatusContainer" class="relative">
+                <button id="openAuthModalBtn" style="background-color: rgba(88, 10, 10, 0.95); border: 2px solid #fbbf24; color: #fde68a;" class="px-4 h-12 rounded-full flex items-center gap-2 shadow-2xl text-xs sm:text-sm font-bold active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-user-circle text-lg"></i>
+                    <span id="userDisplayName">Đăng Nhập</span>
+                </button>
+                <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-2 border border-yellow-500/50 shadow-2xl hidden z-50">
+                    <button id="logoutBtn" class="w-full text-left px-3 py-2 rounded-xl text-red-200 hover:bg-red-800/60 hover:text-yellow-300 text-xs font-bold transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất
+                    </button>
+                </div>
+            </div>
+            <button id="fireworksToggleBtn" title="Bắn pháo hoa" class="glass-card text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center border border-yellow-500/50 cursor-pointer"><i class="fa-solid fa-burst text-xl"></i></button>
+            <button id="musicToggleBtn" title="Nhạc Tết" class="glass-card text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center border border-yellow-500/50 cursor-pointer"><i id="musicIcon" class="fa-solid fa-music text-lg"></i></button>
+        </div>
+
+        <iframe id="ytMusicPlayer" style="display:none;" width="0" height="0" src="https://www.youtube.com/embed/V0mpjcAjL4o?enablejsapi=1&autoplay=1&loop=1&playlist=V0mpjcAjL4o" allow="autoplay"></iframe>
+
+        <header class="pt-16 pb-4 text-center px-4">
+            <h1 class="font-cursive text-5xl sm:text-7xl md:text-8xl text-yellow-400 gold-text-glow font-bold mb-2">Chúc Mừng Năm Mới</h1>
+            <p class="font-serif italic text-lg sm:text-2xl text-red-200 opacity-90">"Xuân an khang đức tài như ý – Niên thịnh vượng phúc thọ vô biên"</p>
+        </header>
+
+        <main class="container mx-auto px-4 py-4 flex-grow flex flex-col items-center justify-center gap-8">
+            <!-- Countdown -->
+            <section class="w-full max-w-4xl glass-card rounded-3xl p-6 text-center border-2 border-yellow-500/50">
+                <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-widest text-yellow-400 mb-4"><i class="fa-solid fa-hourglass-start"></i> Đếm ngược Giao Thừa Đinh Mùi 2027</h2>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="days" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Ngày</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="hours" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Giờ</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="minutes" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Phút</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="seconds" class="font-bold text-3xl text-yellow-400">00</span><p class="text-[10px] uppercase">Giây</p></div>
+                </div>
+            </section>
+
+            <!-- Grid Chức Năng & Bảng Vàng & Chat -->
+            <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Điểm Danh -->
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+                            <h3 class="font-serif text-lg font-bold text-yellow-300">Điểm Danh</h3>
+                        </div>
+                        <div id="checkinStatusBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Chưa điểm danh...</div>
+                        <button id="checkinBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] cursor-pointer">Điểm Danh Ngay</button>
+                    </section>
+                    <!-- Rút Quẻ -->
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-box-archive"></i></div>
+                            <h3 class="font-serif text-lg font-bold text-yellow-300">Rút Quẻ</h3>
+                        </div>
+                        <div id="queResultBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Thỉnh quẻ đầu năm...</div>
+                        <button id="rutQueBtn" class="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] cursor-pointer">Rút Quẻ Ngay</button>
+                    </section>
+                    <!-- Ủng Hộ -->
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-heart text-red-400 animate-pulse"></i></div>
+                            <h3 class="font-serif text-lg font-bold text-yellow-300">Ủng Hộ Tác Giả</h3>
+                        </div>
+                        <div class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Cảm ơn các anh đẹp trai! ❤️</div>
+                        <button id="supportBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-red-950 font-bold uppercase text-[11px] cursor-pointer">Ủng Hộ Ngay</button>
+                    </section>
+                    <!-- Bảng Vàng -->
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                        <div>
+                            <div class="w-10 h-10 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-lg"><i class="fa-solid fa-trophy"></i></div>
+                            <h3 class="font-serif text-base font-bold text-yellow-300">Bảng Vàng</h3>
+                        </div>
+                        <div id="leaderboardList" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] max-h-28 overflow-y-auto space-y-1 text-left">
+                            <div class="text-center text-red-300/60">Đang tải bảng vàng...</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Chat Room -->
+                <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl h-[400px]">
+                    <div class="flex items-center justify-between pb-2 border-b border-yellow-500/30">
+                        <h3 class="font-serif text-sm font-bold text-yellow-300">Phòng Chat Chung</h3>
+                        <span class="text-[9px] text-emerald-400 font-semibold">● Online (Xoá sau 5 phút)</span>
+                    </div>
+                    <div id="chatMessagesBox" class="flex-grow my-2 overflow-y-auto space-y-2 pr-1 text-xs">
+                        <div class="text-center text-yellow-200/60 py-2">Đang tải tin nhắn...</div>
+                    </div>
+                    <form id="chatForm" class="flex items-center gap-2 pt-2 border-t border-yellow-500/20">
+                        <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 text-xs focus:outline-none">
+                        <button type="submit" class="w-9 h-9 rounded-xl bg-yellow-500 text-red-950 font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Đăng Nhập / Đăng Ký (Xác thực Gmail OTP) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
+        <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 relative shadow-2xl">
+            <button id="closeAuthModal" class="absolute top-3 right-3 text-yellow-400 w-7 h-7 rounded-full flex items-center justify-center border border-yellow-500/30 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex rounded-xl bg-red-950/90 p-1 border border-yellow-500/40 mb-4">
+                <button id="tabLogin" class="flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 cursor-pointer">Đăng Nhập</button>
+                <button id="tabRegister" class="flex-1 py-2 rounded-lg text-xs font-bold text-red-200 cursor-pointer">Đăng Ký</button>
+            </div>
+            <!-- Form Đăng Nhập -->
+            <div id="formLogin" class="space-y-3">
+                <input type="email" id="loginEmail" placeholder="Email (abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
+                <input type="password" id="loginPass" placeholder="Mật khẩu..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
+                <button id="submitLogin" class="w-full py-3 bg-yellow-500 text-red-950 font-bold rounded-xl text-sm uppercase cursor-pointer">Đăng Nhập</button>
+            </div>
+            <!-- Form Đăng Ký -->
+            <div id="formRegister" class="space-y-3 hidden">
+                <input type="text" id="regName" placeholder="Tên hiển thị..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
+                <input type="email" id="regEmail" placeholder="Email hợp lệ (abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
+                <input type="password" id="regPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
+                <button id="submitRegister" class="w-full py-3 bg-red-600 text-yellow-300 font-bold rounded-xl text-sm uppercase cursor-pointer">Gửi Mã Xác Nhận Gmail</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gọi file mã nguồn JavaScript xử lý -->
+    <script src="script.js"></script>
+</body>
+  </html>
+  
