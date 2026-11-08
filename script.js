@@ -21,7 +21,7 @@ function showModal(title, msg, icon = "fa-bell") {
 }
 document.getElementById('modalCloseBtn').onclick = () => document.getElementById('customModal').classList.add('hidden');
 
-// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (TRỰC TIẾP KHÔNG CẦN OTP) ---
+// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (ĐĂNG KÝ TRỰC TIẾP) ---
 const authModal = document.getElementById('authModal');
 document.getElementById('openAuthModalBtn').onclick = (e) => {
     e.stopPropagation();
@@ -55,7 +55,7 @@ function getUsersDB() {
     return JSON.parse(localStorage.getItem('tet_users_database')) || [];
 }
 
-// 1. ĐĂNG KÝ TRỰC TIẾP
+// Đăng ký trực tiếp không qua OTP
 document.getElementById('submitRegister').onclick = function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -81,7 +81,7 @@ document.getElementById('submitRegister').onclick = function() {
     document.getElementById('tabLogin').click();
 };
 
-// 2. ĐĂNG NHẬP
+// Đăng nhập
 document.getElementById('submitLogin').onclick = function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -130,7 +130,7 @@ window.onclick = function(e) {
     if (!document.getElementById('authStatusContainer').contains(e.target)) { document.getElementById('userDropdownMenu').classList.add('hidden'); }
 };
 
-// --- BẢNG VÀNG XẾP HẠNG THEO SỐ NGÀY ĐIỂM DANH ---
+// --- BẢNG VÀNG XẾP HẠNG ---
 function loadLeaderboard() {
     let data = JSON.parse(localStorage.getItem('tet_leaderboard')) || [
         { name: "Admin", streak: 5 },
@@ -205,7 +205,6 @@ checkinBtn.onclick = function() {
     checkCheckinStatus();
     loadLeaderboard();
     showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh tăng ngày streak trên bảng vàng!`, "fa-award");
-    triggerFireworkBurst();
 };
 
 const queList = [
@@ -219,14 +218,13 @@ document.getElementById('rutQueBtn').onclick = function() {
     const randomQue = queList[Math.floor(Math.random() * queList.length)];
     document.getElementById('queResultBox').innerText = randomQue;
     showModal("Quẻ Thẻ Đầu Năm 2027", randomQue, "fa-scroll");
-    triggerFireworkBurst();
 };
 
 document.getElementById('supportBtn').onclick = function() {
     window.open(MY_LINK4M_URL, '_blank');
 };
 
-// --- PHÒNG CHAT CHUNG (Tự xoá sau 5 phút) ---
+// --- PHÒNG CHAT CHUNG ---
 const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
 const chatMessagesBox = document.getElementById('chatMessagesBox');
@@ -239,7 +237,7 @@ function getChatHistory() {
 
 function loadChat() {
     const history = getChatHistory();
-    chatMessagesBox.innerHTML = `
+    let htmlContent = `
         <div class="flex items-start gap-2">
             <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">
                 AD
@@ -254,25 +252,24 @@ function loadChat() {
     const current = localStorage.getItem('tet_current_user');
     history.forEach(msg => {
         const isSelf = msg.sender === current;
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}`;
-        
         const avatarChar = msg.sender.charAt(0).toUpperCase();
         const avatarBg = isSelf ? 'bg-amber-500/30 border-amber-400 text-yellow-200' : 'bg-red-500/30 border-red-400 text-yellow-300';
         const bubbleBg = isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none';
 
-        msgDiv.innerHTML = `
-            <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">
-                ${avatarChar}
-            </div>
-            <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow">
-                <div class="text-[9px] ${isSelf ? 'text-amber-300' : 'text-yellow-400'} font-bold mb-0.5">${msg.sender}</div>
-                <div class="text-red-100 text-[11px] break-words">${msg.text}</div>
-                <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${msg.time}</div>
+        htmlContent += `
+            <div class="flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}">
+                <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                    ${avatarChar}
+                </div>
+                <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow">
+                    <div class="text-[9px] ${isSelf ? 'text-amber-300' : 'text-yellow-400'} font-bold mb-0.5">${msg.sender}</div>
+                    <div class="text-red-100 text-[11px] break-words">${msg.text}</div>
+                    <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${msg.time}</div>
+                </div>
             </div>
         `;
-        chatMessagesBox.appendChild(msgDiv);
     });
+    chatMessagesBox.innerHTML = htmlContent;
     chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
 }
 
@@ -296,12 +293,11 @@ chatForm.onsubmit = function(e) {
     localStorage.setItem('tet_chat', JSON.stringify(history));
     loadChat();
     chatInput.value = "";
-    triggerFireworkBurst();
 };
 
 setInterval(loadChat, 10000);
 
-// Pháo hoa nền
+// Hiệu ứng pháo hoa nhẹ tối ưu hiệu suất chống lag
 const canvas = document.getElementById('fireworksCanvas');
 const ctx = canvas.getContext('2d');
 function resizeCanvas() {
@@ -315,11 +311,11 @@ class Particle {
     constructor(x, y, color) {
         this.x = x; this.y = y; this.color = color;
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 6 + 2;
+        const speed = Math.random() * 5 + 2;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = Math.random() * 0.015 + 0.010;
+        this.decay = Math.random() * 0.02 + 0.015;
     }
     update() {
         this.x += this.vx; this.y += this.vy;
@@ -329,7 +325,7 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
@@ -338,39 +334,29 @@ class Particle {
 
 let particles = [];
 function createFirework(x, y) {
-    const colors = ['#FBBF24', '#EF4444', '#10B981', '#3B82F6', '#EC4899', '#FDE68A'];
+    if (particles.length > 80) return; // Giới hạn số lượng hạt để máy yếu không bị lag
+    const colors = ['#FBBF24', '#EF4444', '#10B981', '#3B82F6', '#EC4899'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 30; i++) {
         particles.push(new Particle(x, y, color));
     }
 }
 
-function triggerFireworkBurst() {
-    createFirework(Math.random() * canvas.width * 0.8 + canvas.width * 0.1, Math.random() * canvas.height * 0.5);
-}
-
-window.addEventListener('click', (e) => {
-    if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
-        createFirework(e.clientX, e.clientY);
-    }
-});
-
-document.getElementById('fireworksToggleBtn').addEventListener('click', () => {
-    triggerFireworkBurst(); triggerFireworkBurst();
-});
-
 function animateFireworks() {
-    ctx.fillStyle = 'rgba(23, 2, 2, 0.2)';
+    ctx.fillStyle = 'rgba(23, 2, 2, 0.25)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    particles.forEach((p, index) => {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
         if (p.alpha <= 0) {
-            particles.splice(index, 1);
+            particles.splice(i, 1);
         } else {
             p.update(); p.draw();
         }
-    });
+    }
     requestAnimationFrame(animateFireworks);
 }
 animateFireworks();
 
-setInterval(triggerFireworkBurst, 2500);
+setInterval(() => {
+    createFirework(Math.random() * canvas.width * 0.8 + canvas.width * 0.1, Math.random() * canvas.height * 0.4);
+}, 3500);
