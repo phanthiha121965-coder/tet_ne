@@ -12,14 +12,18 @@ setInterval(() => {
     }
 }, 1000);
 
-// Quản lý Modal thông báo (hiện đè lên trên cùng, không bị che khuất)
+// Quản lý Modal thông báo (Luôn hiện nổi lên trên cùng với z-index cực lớn)
 function showModal(title, msg, icon = "fa-bell") {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalMessage').innerText = msg;
     document.getElementById('modalIcon').className = `fa-solid ${icon} text-yellow-300`;
+    
+    // Đóng hẳn khung đăng nhập trước nếu đang mở để không bị che khuất
+    document.getElementById('authModal').classList.add('hidden');
+
     const modal = document.getElementById('customModal');
     modal.classList.remove('hidden');
-    modal.style.zIndex = "99999"; // Đảm bảo luôn hiện nổi lên trên cùng
+    modal.style.zIndex = "99999";
 }
 document.getElementById('modalCloseBtn').onclick = () => {
     document.getElementById('customModal').classList.add('hidden');
@@ -34,7 +38,7 @@ document.getElementById('openAuthModalBtn').onclick = (e) => {
         document.getElementById('userDropdownMenu').classList.toggle('hidden');
     } else {
         authModal.classList.remove('hidden');
-        authModal.style.zIndex = "99998";
+        authModal.style.zIndex = "9998";
     }
 };
 document.getElementById('closeAuthModal').onclick = () => authModal.classList.add('hidden');
@@ -65,7 +69,7 @@ function getUsersDB() {
     return users;
 }
 
-// Đăng ký trực tiếp
+// Đăng ký trực tiếp (Tự động ẩn bảng đăng ký để hiện thông báo)
 document.getElementById('submitRegister').onclick = function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -87,11 +91,13 @@ document.getElementById('submitRegister').onclick = function() {
     users.push({ name: name, email: email, pass: pass });
     localStorage.setItem('tet_users_database', JSON.stringify(users));
 
-    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo! Hãy chuyển sang tab Đăng Nhập.`, "fa-face-smile-beam");
+    // Ẩn form đăng ký và hiện ngay bảng thông báo thành công
+    authModal.classList.add('hidden');
+    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo thành công! Hãy mở lại và đăng nhập.`, "fa-face-smile-beam");
     document.getElementById('tabLogin').click();
 };
 
-// Đăng nhập
+// Đăng nhập (Tự động ẩn bảng đăng nhập để hiện thông báo)
 document.getElementById('submitLogin').onclick = function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -191,7 +197,6 @@ checkinBtn.onclick = function() {
     const username = localStorage.getItem('tet_current_user');
     if (!username) {
         showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản đã đăng ký trước khi điểm danh!", "fa-user-lock");
-        authModal.classList.remove('hidden');
         return;
     }
     const today = new Date().toDateString();
@@ -292,7 +297,6 @@ chatForm.onsubmit = function(e) {
     const username = localStorage.getItem('tet_current_user');
     if (!username) {
         showModal("Yêu Cầu Đăng Nhập", "Bạn cần đăng nhập tài khoản hợp lệ để nhắn tin trò chuyện!", "fa-user-lock");
-        authModal.classList.remove('hidden');
         return;
     }
 
