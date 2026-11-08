@@ -12,16 +12,20 @@ setInterval(() => {
     }
 }, 1000);
 
-// Quản lý Modal thông báo
+// Quản lý Modal thông báo (hiện đè lên trên cùng, không bị che khuất)
 function showModal(title, msg, icon = "fa-bell") {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalMessage').innerText = msg;
     document.getElementById('modalIcon').className = `fa-solid ${icon} text-yellow-300`;
-    document.getElementById('customModal').classList.remove('hidden');
+    const modal = document.getElementById('customModal');
+    modal.classList.remove('hidden');
+    modal.style.zIndex = "99999"; // Đảm bảo luôn hiện nổi lên trên cùng
 }
-document.getElementById('modalCloseBtn').onclick = () => document.getElementById('customModal').classList.add('hidden');
+document.getElementById('modalCloseBtn').onclick = () => {
+    document.getElementById('customModal').classList.add('hidden');
+};
 
-// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (ĐĂNG KÝ TRỰC TIẾP) ---
+// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN ---
 const authModal = document.getElementById('authModal');
 document.getElementById('openAuthModalBtn').onclick = (e) => {
     e.stopPropagation();
@@ -30,6 +34,7 @@ document.getElementById('openAuthModalBtn').onclick = (e) => {
         document.getElementById('userDropdownMenu').classList.toggle('hidden');
     } else {
         authModal.classList.remove('hidden');
+        authModal.style.zIndex = "99998";
     }
 };
 document.getElementById('closeAuthModal').onclick = () => authModal.classList.add('hidden');
@@ -48,14 +53,19 @@ document.getElementById('tabRegister').onclick = function() {
 };
 
 function isValidEmail(email) { 
-    return email.endsWith('@gmail.com') && email.length > 10; 
+    return email.includes('@') && email.includes('.') && email.length > 5; 
 }
 
 function getUsersDB() {
-    return JSON.parse(localStorage.getItem('tet_users_database')) || [];
+    let users = JSON.parse(localStorage.getItem('tet_users_database'));
+    if (!users || users.length === 0) {
+        users = [{ name: "Phan Dũng", email: "dunghoet.vtpt@gmail.com", pass: "123456" }];
+        localStorage.setItem('tet_users_database', JSON.stringify(users));
+    }
+    return users;
 }
 
-// Đăng ký trực tiếp không qua OTP
+// Đăng ký trực tiếp
 document.getElementById('submitRegister').onclick = function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -63,10 +73,10 @@ document.getElementById('submitRegister').onclick = function() {
 
     if (!name) { showModal("Lỗi", "Vui lòng nhập tên hiển thị!"); return; }
     if (!isValidEmail(email)) { 
-        showModal("Lỗi Định Dạng", "Email bắt buộc phải có đuôi @gmail.com hợp lệ!"); 
+        showModal("Lỗi Định Dạng", "Email không hợp lệ (cần chứa @ và .)"); 
         return; 
     }
-    if (pass.length < 6) { showModal("Lỗi", "Mật khẩu phải từ 6 ký tự trở lên!"); return; }
+    if (pass.length < 4) { showModal("Lỗi", "Mật khẩu phải từ 4 ký tự trở lên!"); return; }
 
     let users = getUsersDB();
     if (users.some(u => u.email === email)) {
@@ -77,7 +87,7 @@ document.getElementById('submitRegister').onclick = function() {
     users.push({ name: name, email: email, pass: pass });
     localStorage.setItem('tet_users_database', JSON.stringify(users));
 
-    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo thành công! Hãy chuyển sang tab Đăng Nhập.`, "fa-face-smile-beam");
+    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo! Hãy chuyển sang tab Đăng Nhập.`, "fa-face-smile-beam");
     document.getElementById('tabLogin').click();
 };
 
@@ -87,7 +97,7 @@ document.getElementById('submitLogin').onclick = function() {
     const pass = document.getElementById('loginPass').value.trim();
 
     if (!isValidEmail(email)) { 
-        showModal("Lỗi", "Email đăng nhập phải có đuôi @gmail.com hợp lệ!"); 
+        showModal("Lỗi", "Email đăng nhập không hợp lệ!"); 
         return; 
     }
     if (!pass) { showModal("Lỗi", "Vui lòng nhập mật khẩu!"); return; }
@@ -118,6 +128,7 @@ document.getElementById('logoutBtn').onclick = function() {
 };
 
 window.onload = function() {
+    getUsersDB();
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
     loadLeaderboard();
@@ -297,7 +308,7 @@ chatForm.onsubmit = function(e) {
 
 setInterval(loadChat, 10000);
 
-// Hiệu ứng pháo hoa nhẹ tối ưu hiệu suất chống lag
+// Pháo hoa siêu nhẹ chống lag
 const canvas = document.getElementById('fireworksCanvas');
 const ctx = canvas.getContext('2d');
 function resizeCanvas() {
@@ -311,11 +322,11 @@ class Particle {
     constructor(x, y, color) {
         this.x = x; this.y = y; this.color = color;
         const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 5 + 2;
+        const speed = Math.random() * 4 + 2;
         this.vx = Math.cos(angle) * speed;
         this.vy = Math.sin(angle) * speed;
         this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
+        this.decay = Math.random() * 0.025 + 0.02;
     }
     update() {
         this.x += this.vx; this.y += this.vy;
@@ -325,7 +336,7 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
@@ -334,16 +345,16 @@ class Particle {
 
 let particles = [];
 function createFirework(x, y) {
-    if (particles.length > 80) return; // Giới hạn số lượng hạt để máy yếu không bị lag
-    const colors = ['#FBBF24', '#EF4444', '#10B981', '#3B82F6', '#EC4899'];
+    if (particles.length > 50) return;
+    const colors = ['#FBBF24', '#EF4444', '#10B981', '#3B82F6'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 20; i++) {
         particles.push(new Particle(x, y, color));
     }
 }
 
 function animateFireworks() {
-    ctx.fillStyle = 'rgba(23, 2, 2, 0.25)';
+    ctx.fillStyle = 'rgba(23, 2, 2, 0.3)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for (let i = particles.length - 1; i >= 0; i--) {
         let p = particles[i];
@@ -359,4 +370,4 @@ animateFireworks();
 
 setInterval(() => {
     createFirework(Math.random() * canvas.width * 0.8 + canvas.width * 0.1, Math.random() * canvas.height * 0.4);
-}, 3500);
+}, 4000);
