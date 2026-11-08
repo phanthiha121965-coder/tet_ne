@@ -88,7 +88,7 @@
         <!-- POPUP THÔNG BÁO TÙY CHỈNH -->
         <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
             <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
-                <div id="modalIconContainer" class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
+                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
                     <i id="modalIcon" class="fa-solid fa-bell text-yellow-300"></i>
                 </div>
                 <h3 id="modalTitle" class="font-serif text-xl font-bold text-yellow-300 mb-2">Thông Báo</h3>
@@ -212,7 +212,7 @@
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
                             <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Điểm Danh</h3>
-                            <p class="text-xs text-red-200 mb-3">Nhận lì xì & lên bảng vàng.</p>
+                            <p class="text-xs text-red-200 mb-3">Điểm danh nhận lì xì xông đất.</p>
                         </div>
                         <div id="checkinStatusBox" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
                             Chưa điểm danh...
@@ -275,20 +275,20 @@
 
                 </div>
 
-                <!-- Cột phải: Bảng Xếp Hạng Đồng Bộ Toàn Quốc (Cloud) -->
+                <!-- Cột phải: Bảng Vàng Xông Đất Thực Tế -->
                 <section class="glass-card rounded-3xl p-5 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl relative">
                     <div>
                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-yellow-500/30">
                             <h3 class="font-serif text-lg font-bold text-yellow-300 flex items-center gap-2">
-                                <i class="fa-solid fa-trophy text-yellow-400 animate-bounce"></i> Bảng Vàng Toàn Quốc
+                                <i class="fa-solid fa-trophy text-yellow-400 animate-bounce"></i> Bảng Vàng Xông Đất
                             </h3>
-                            <span class="text-[10px] bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 px-2 py-0.5 rounded-full uppercase font-bold">Online</span>
+                            <span class="text-[10px] bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 px-2 py-0.5 rounded-full uppercase font-bold">Thực Tế</span>
                         </div>
-                        <p class="text-[11px] text-red-200 mb-3 italic">Thành viên từ Nam ra Bắc điểm danh sớm nhất:</p>
+                        <p class="text-[11px] text-red-200 mb-3 italic">Thành viên điểm danh nhận lì xì:</p>
                         
-                        <!-- Danh sách BXH đồng bộ đám mây -->
+                        <!-- Danh sách BXH thực tế -->
                         <div id="leaderboardList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-                            <div class="text-center text-xs text-yellow-200/60 py-4">Đang tải dữ liệu từ đám mây...</div>
+                            <div class="text-center text-xs text-yellow-200/60 py-4">Chưa có ai điểm danh. Hãy là người đầu tiên!</div>
                         </div>
                     </div>
 
@@ -361,10 +361,6 @@
     <!-- JavaScript Xử Lý Ứng Dụng -->
     <script>
         const MY_LINK4M_URL = "https://link4m.net/JtoYhsH";
-        
-        // Cấu hình kho lưu trữ đám mây công khai cho bảng xếp hạng toàn quốc
-        const JSONBIN_BIN_ID = "6790a88ead19ca34f8f41123"; // ID kho chứa dữ liệu chung
-        const JSONBIN_API_KEY = "$2a$10$X..."; // Khóa API công khai kết nối đám mây
 
         function showModal(title, message, iconClass = "fa-bell") {
             document.getElementById('modalTitle').innerText = title;
@@ -413,7 +409,7 @@
                 homeSection.classList.add('hidden');
                 thankyouSection.classList.remove('hidden');
             }
-            fetchLeaderboardCloud();
+            loadLeaderboard();
         });
 
         // Popup Năn Nỉ Cute
@@ -464,30 +460,25 @@
             }
         });
 
-        // --- HỆ THỐNG ĐÁM MÂY TOÀN QUỐC (JSONBIN) ---
-        async function fetchLeaderboardCloud() {
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/67b00a5cad19ca34f8f41000/latest`, {
-                    headers: { 'X-Master-Key': '$2a$10$7... (public)' }
-                });
-                // Fallback nếu kết nối mạng bận, dùng dữ liệu mẫu thời gian thực
-                renderLeaderboard([
-                    { name: "Phan Dũng (Phú Thọ)", time: "Vừa xong", lixi: "🧧 500K" },
-                    { name: "Hoàng Nam (Hà Nội)", time: "5 phút trước", lixi: "🧧 200K" },
-                    { name: "Gia Bảo (TP.HCM)", time: "12 phút trước", lixi: "🧧 100K" },
-                    { name: "Thanh Trúc (Đà Nẵng)", time: "25 phút trước", lixi: "🧧 100K" }
-                ]);
-            } catch (e) {
-                renderLeaderboard([
-                    { name: "Phan Dũng", time: "Hôm nay", lixi: "🧧 500K" }
-                ]);
-            }
+        // --- HỆ THỐNG BẢNG VÀNG THỰC TẾ (Lưu trên LocalStorage) ---
+        function getLeaderboard() {
+            return JSON.parse(localStorage.getItem('tet_real_leaderboard')) || [];
         }
 
-        function renderLeaderboard(data) {
-            const listContainer = document.getElementById('leaderboardList');
-            listContainer.innerHTML = "";
+        function saveLeaderboard(data) {
+            localStorage.setItem('tet_real_leaderboard', JSON.stringify(data));
+        }
 
+        function loadLeaderboard() {
+            const listContainer = document.getElementById('leaderboardList');
+            const data = getLeaderboard();
+            
+            if (data.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-xs text-yellow-200/60 py-4">Chưa có ai điểm danh. Hãy là người đầu tiên!</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = "";
             data.forEach((item, index) => {
                 let medalColor = "text-yellow-300";
                 if(index === 0) medalColor = "text-yellow-400 font-extrabold";
@@ -510,22 +501,19 @@
             });
         }
 
-        function pushUserToLeaderboard(username) {
-            const listContainer = document.getElementById('leaderboardList');
-            const nowStr = "Vừa xong";
-            const newRow = document.createElement('div');
-            newRow.className = "flex items-center justify-between p-2 rounded-xl bg-red-950/60 border border-yellow-500/20 text-xs animate-bounce";
-            newRow.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <span class="w-5 text-center text-yellow-400 font-extrabold">#1</span>
-                    <span class="font-semibold text-yellow-100">${username}</span>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] text-yellow-300 font-bold block">🧧 200K Lộc</span>
-                    <span class="text-[9px] text-red-300/80">${nowStr}</span>
-                </div>
-            `;
-            listContainer.prepend(newRow);
+        function addCheckinToLeaderboard(username) {
+            let data = getLeaderboard();
+            // Kiểm tra xem user này đã điểm danh chưa, nếu rồi thì cập nhật giờ
+            const existingIndex = data.findIndex(i => i.name === username);
+            const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " Hôm nay";
+            
+            if (existingIndex !== -1) {
+                data[existingIndex].time = nowStr;
+            } else {
+                data.unshift({ name: username, time: nowStr, lixi: "🧧 Đã Nhận Lì Xì" });
+            }
+            saveLeaderboard(data);
+            loadLeaderboard();
         }
 
         // Điểm danh hàng ngày
@@ -546,7 +534,7 @@
         checkinBtn.addEventListener('click', () => {
             const username = localStorage.getItem('tet_username');
             if (!username) {
-                showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản trước khi điểm danh nhận lộc nhé!", "fa-user-lock");
+                showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản trước khi điểm danh xông đất nhé!", "fa-user-lock");
                 document.getElementById('authModal').classList.remove('hidden');
                 return;
             }
@@ -561,8 +549,8 @@
             checkinBtn.innerText = "Đã Điểm Danh";
             checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
             
-            pushUserToLeaderboard(username);
-            showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh nhận lộc và vinh danh lên bảng vàng toàn quốc!`, "fa-award");
+            addCheckinToLeaderboard(username);
+            showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh xông đất thành công và ghi tên lên bảng vàng!`, "fa-award");
             triggerFireworkBurst();
         });
 
@@ -641,7 +629,6 @@
             document.getElementById('userDisplayName').innerText = username;
             authModal.classList.add('hidden');
             showModal("Đăng Nhập Thành Công", `Chào mừng bạn trở lại, ${username}!`, "fa-face-smile-beam");
-            pushUserToLeaderboard(username);
         });
 
         document.getElementById('submitRegister').addEventListener('click', () => {
@@ -666,7 +653,6 @@
             document.getElementById('userDisplayName').innerText = name;
             authModal.classList.add('hidden');
             showModal("Đăng Ký Thành Công", `Chào mừng thành viên mới ${name} gia nhập đại gia đình Tết 2027!`, "fa-champagne-glasses");
-            pushUserToLeaderboard(name);
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
