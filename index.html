@@ -75,55 +75,57 @@
 
         <iframe id="ytMusicPlayer" style="display:none;" width="0" height="0" src="https://www.youtube.com/embed/V0mpjcAjL4o?enablejsapi=1&autoplay=1&loop=1&playlist=V0mpjcAjL4o" allow="autoplay"></iframe>
 
-        <header class="pt-16 pb-4 text-center px-4">
-            <h1 class="font-cursive text-5xl sm:text-7xl md:text-8xl text-yellow-400 gold-text-glow font-bold mb-2">Chúc Mừng Năm Mới</h1>
-            <p class="font-serif italic text-lg sm:text-2xl text-red-200 opacity-90">"Xuân an khang đức tài như ý – Niên thịnh vượng phúc thọ vô biên"</p>
+        <!-- PHẦN HEADER ĐƯỢC TỐI ƯU CO GIÃN TOÀN MÀN HÌNH -->
+        <header class="pt-16 pb-6 text-center px-4 w-full max-w-7xl mx-auto">
+            <h1 class="font-cursive text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-yellow-400 gold-text-glow font-bold mb-3">Chúc Mừng Năm Mới</h1>
+            <p class="font-serif italic text-base sm:text-xl md:text-2xl text-red-200 opacity-90 px-2">"Xuân an khang đức tài như ý – Niên thịnh vượng phúc thọ vô biên"</p>
         </header>
 
-        <main class="container mx-auto px-4 py-4 flex-grow flex flex-col items-center justify-center gap-8">
+        <!-- PHẦN MAIN CONTAINER ĐƯỢC TỐI ƯU CÂN ĐỐI TRÊN PC VÀ MOBILE -->
+        <main class="container mx-auto px-4 py-4 flex-grow flex flex-col items-center justify-center gap-8 w-full max-w-7xl">
             <!-- Countdown -->
-            <section class="w-full max-w-4xl glass-card rounded-3xl p-6 text-center border-2 border-yellow-500/50">
+            <section class="w-full max-w-4xl glass-card rounded-3xl p-6 text-center border-2 border-yellow-500/50 shadow-2xl">
                 <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-widest text-yellow-400 mb-4"><i class="fa-solid fa-hourglass-start"></i> Đếm ngược Giao Thừa Đinh Mùi 2027</h2>
-                <div class="grid grid-cols-4 gap-4">
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="days" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Ngày</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="hours" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Giờ</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="minutes" class="font-bold text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Phút</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="seconds" class="font-bold text-3xl text-yellow-400">00</span><p class="text-[10px] uppercase">Giây</p></div>
+                <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="days" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Ngày</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="hours" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Giờ</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="minutes" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Phút</p></div>
+                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="seconds" class="font-bold text-2xl sm:text-3xl text-yellow-400">00</span><p class="text-[10px] uppercase">Giây</p></div>
                 </div>
             </section>
 
-            <!-- Grid Chức Năng & Bảng Vàng & Chat -->
-            <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Grid Chức Năng & Bảng Vàng & Chat (Bố cục tự co giãn full màn hình linh hoạt) -->
+            <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Điểm Danh -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
                             <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-calendar-check"></i></div>
                             <h3 class="font-serif text-lg font-bold text-yellow-300">Điểm Danh</h3>
                         </div>
                         <div id="checkinStatusBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Chưa điểm danh...</div>
-                        <button id="checkinBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] cursor-pointer">Điểm Danh Ngay</button>
+                        <button id="checkinBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Điểm Danh Ngay</button>
                     </section>
                     <!-- Rút Quẻ -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
                             <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-box-archive"></i></div>
                             <h3 class="font-serif text-lg font-bold text-yellow-300">Rút Quẻ</h3>
                         </div>
                         <div id="queResultBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Thỉnh quẻ đầu năm...</div>
-                        <button id="rutQueBtn" class="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] cursor-pointer">Rút Quẻ Ngay</button>
+                        <button id="rutQueBtn" class="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Rút Quẻ Ngay</button>
                     </section>
                     <!-- Ủng Hộ -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
                             <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-heart text-red-400 animate-pulse"></i></div>
                             <h3 class="font-serif text-lg font-bold text-yellow-300">Ủng Hộ Tác Giả</h3>
                         </div>
                         <div class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Cảm ơn các anh đẹp trai! ❤️</div>
-                        <button id="supportBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-red-950 font-bold uppercase text-[11px] cursor-pointer">Ủng Hộ Ngay</button>
+                        <button id="supportBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-red-950 font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Ủng Hộ Ngay</button>
                     </section>
                     <!-- Bảng Vàng -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center">
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
                             <div class="w-10 h-10 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-lg"><i class="fa-solid fa-trophy"></i></div>
                             <h3 class="font-serif text-base font-bold text-yellow-300">Bảng Vàng</h3>
@@ -135,7 +137,7 @@
                 </div>
 
                 <!-- Chat Room -->
-                <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl h-[400px]">
+                <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl h-[400px] w-full">
                     <div class="flex items-center justify-between pb-2 border-b border-yellow-500/30">
                         <h3 class="font-serif text-sm font-bold text-yellow-300">Phòng Chat Chung</h3>
                         <span class="text-[9px] text-emerald-400 font-semibold">● Online (Xoá sau 5 phút)</span>
