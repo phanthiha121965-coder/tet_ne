@@ -1,5 +1,18 @@
 const MY_LINK4M_URL = "https://link4m.net/JtoYhsH";
 
+// --- CẤU HÌNH FIREBASE CLOUD DATABASE (ONLINE REALTIME) ---
+const firebaseConfig = {
+    apiKey: "AIzaSyD-Tết2027DemoKeyOnlineRealtimeABC",
+    authDomain: "tet2027-online.firebaseapp.com",
+    projectId: "tet2027-online",
+    storageBucket: "tet2027-online.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcdef"
+};
+// Khởi tạo Firebase (Sử dụng Firestore công khai cho dự án web Tết)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // Đếm ngược Tết 2027
 const targetDate = new Date('February 6, 2027 00:00:00').getTime();
 setInterval(() => {
@@ -12,15 +25,12 @@ setInterval(() => {
     }
 }, 1000);
 
-// Quản lý Modal thông báo (Luôn hiện nổi lên trên cùng với z-index cực lớn)
+// Quản lý Modal thông báo
 function showModal(title, msg, icon = "fa-bell") {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalMessage').innerText = msg;
     document.getElementById('modalIcon').className = `fa-solid ${icon} text-yellow-300`;
-    
-    // Đóng hẳn khung đăng nhập trước nếu đang mở để không bị che khuất
     document.getElementById('authModal').classList.add('hidden');
-
     const modal = document.getElementById('customModal');
     modal.classList.remove('hidden');
     modal.style.zIndex = "99999";
@@ -29,7 +39,7 @@ document.getElementById('modalCloseBtn').onclick = () => {
     document.getElementById('customModal').classList.add('hidden');
 };
 
-// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN ---
+// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (LƯU TRÊN FIREBASE CLOUD) ---
 const authModal = document.getElementById('authModal');
 document.getElementById('openAuthModalBtn').onclick = (e) => {
     e.stopPropagation();
@@ -60,69 +70,60 @@ function isValidEmail(email) {
     return email.includes('@') && email.includes('.') && email.length > 5; 
 }
 
-function getUsersDB() {
-    let users = JSON.parse(localStorage.getItem('tet_users_database'));
-    if (!users || users.length === 0) {
-        users = [{ name: "Phan Dũng", email: "dunghoet.vtpt@gmail.com", pass: "123456" }];
-        localStorage.setItem('tet_users_database', JSON.stringify(users));
-    }
-    return users;
-}
-
-// Đăng ký trực tiếp (Tự động ẩn bảng đăng ký để hiện thông báo)
-document.getElementById('submitRegister').onclick = function() {
+// Đăng ký tài khoản lên Cloud Database
+document.getElementById('submitRegister').onclick = async function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const pass = document.getElementById('regPass').value.trim();
 
     if (!name) { showModal("Lỗi", "Vui lòng nhập tên hiển thị!"); return; }
-    if (!isValidEmail(email)) { 
-        showModal("Lỗi Định Dạng", "Email không hợp lệ (cần chứa @ và .)"); 
-        return; 
-    }
+    if (!isValidEmail(email)) { showModal("Lỗi Định Dạng", "Email không hợp lệ (cần chứa @ và .)"); return; }
     if (pass.length < 4) { showModal("Lỗi", "Mật khẩu phải từ 4 ký tự trở lên!"); return; }
 
-    let users = getUsersDB();
-    if (users.some(u => u.email === email)) {
-        showModal("Lỗi Đăng Ký", "Email này đã được đăng ký tài khoản trước đó rồi!");
-        return;
+    try {
+        const userRef = db.collection('tet_users').doc(email);
+        const doc = await userRef.get();
+        if (doc.exists) {
+            showModal("Lỗi Đăng Ký", "Email này đã được đăng ký tài khoản trước đó rồi!");
+            return;
+        }
+
+        await userRef.set({ name, email, pass });
+        authModal.classList.add('hidden');
+        showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo trên hệ thống online! Hãy đăng nhập.`, "fa-face-smile-beam");
+        document.getElementById('tabLogin').click();
+    } catch (error) {
+        showModal("Lỗi Kết Nối", "Không thể kết nối đến máy chủ cloud. Vui lòng thử lại!");
     }
-
-    users.push({ name: name, email: email, pass: pass });
-    localStorage.setItem('tet_users_database', JSON.stringify(users));
-
-    // Ẩn form đăng ký và hiện ngay bảng thông báo thành công
-    authModal.classList.add('hidden');
-    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo thành công! Hãy mở lại và đăng nhập.`, "fa-face-smile-beam");
-    document.getElementById('tabLogin').click();
 };
 
-// Đăng nhập (Tự động ẩn bảng đăng nhập để hiện thông báo)
-document.getElementById('submitLogin').onclick = function() {
+// Đăng nhập từ Cloud Database
+document.getElementById('submitLogin').onclick = async function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
 
-    if (!isValidEmail(email)) { 
-        showModal("Lỗi", "Email đăng nhập không hợp lệ!"); 
-        return; 
-    }
+    if (!isValidEmail(email)) { showModal("Lỗi", "Email đăng nhập không hợp lệ!"); return; }
     if (!pass) { showModal("Lỗi", "Vui lòng nhập mật khẩu!"); return; }
 
-    let users = getUsersDB();
-    const foundUser = users.find(u => u.email === email && u.pass === pass);
+    try {
+        const userRef = db.collection('tet_users').doc(email);
+        const doc = await userRef.get();
 
-    if (!foundUser) {
-        showModal("Đăng Nhập Thất Bại", "Email hoặc mật khẩu không chính xác, hoặc tài khoản chưa được đăng ký!");
-        return;
+        if (!doc.exists || doc.data().pass !== pass) {
+            showModal("Đăng Nhập Thất Bại", "Email hoặc mật khẩu không chính xác!");
+            return;
+        }
+
+        const userData = doc.data();
+        localStorage.setItem('tet_current_user', userData.name);
+        document.getElementById('userDisplayName').innerText = userData.name;
+        authModal.classList.add('hidden');
+        
+        showModal("Thành Công", `Chào mừng ${userData.name} đã đăng nhập!`);
+        checkCheckinStatus();
+    } catch (error) {
+        showModal("Lỗi Đăng Nhập", "Lỗi kết nối máy chủ dữ liệu.");
     }
-
-    localStorage.setItem('tet_current_user', foundUser.name);
-    document.getElementById('userDisplayName').innerText = foundUser.name;
-    authModal.classList.add('hidden');
-    
-    showModal("Thành Công", `Chào mừng ${foundUser.name} đã đăng nhập!`);
-    checkCheckinStatus();
-    loadLeaderboard();
 };
 
 document.getElementById('logoutBtn').onclick = function() {
@@ -134,11 +135,10 @@ document.getElementById('logoutBtn').onclick = function() {
 };
 
 window.onload = function() {
-    getUsersDB();
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
-    loadLeaderboard();
-    loadChat();
+    loadLeaderboardRealtime();
+    loadChatRealtime();
     checkCheckinStatus();
 };
 
@@ -147,30 +147,34 @@ window.onclick = function(e) {
     if (!document.getElementById('authStatusContainer').contains(e.target)) { document.getElementById('userDropdownMenu').classList.add('hidden'); }
 };
 
-// --- BẢNG VÀNG XẾP HẠNG ---
-function loadLeaderboard() {
-    let data = JSON.parse(localStorage.getItem('tet_leaderboard')) || [
-        { name: "Admin", streak: 5 },
-        { name: "Phan Dũng", streak: 3 }
-    ];
-    data.sort((a, b) => b.streak - a.streak);
-    const container = document.getElementById('leaderboardList');
-    container.innerHTML = "";
-    data.forEach((item, index) => {
-        let medalColor = "text-yellow-300";
-        if(index === 0) medalColor = "text-yellow-400 font-extrabold";
-        else if(index === 1) medalColor = "text-gray-300 font-bold";
-        else if(index === 2) medalColor = "text-amber-600 font-bold";
+// --- BẢNG VÀNG ĐỒNG BỘ REALTIME ---
+function loadLeaderboardRealtime() {
+    db.collection('tet_leaderboard').orderBy('streak', 'desc').onSnapshot(snapshot => {
+        const container = document.getElementById('leaderboardList');
+        container.innerHTML = "";
+        if (snapshot.empty) {
+            container.innerHTML = `<div class="text-center text-red-300/60">Chưa có ai điểm danh.</div>`;
+            return;
+        }
+        let index = 0;
+        snapshot.forEach(doc => {
+            const item = doc.data();
+            let medalColor = "text-yellow-300";
+            if(index === 0) medalColor = "text-yellow-400 font-extrabold";
+            else if(index === 1) medalColor = "text-gray-300 font-bold";
+            else if(index === 2) medalColor = "text-amber-600 font-bold";
 
-        container.innerHTML += `
-            <div class="flex items-center justify-between p-1.5 rounded-xl bg-red-950/60 border border-yellow-500/20 text-[11px]">
-                <div class="flex items-center gap-2">
-                    <span class="w-5 text-center font-bold ${medalColor}">#${index + 1}</span>
-                    <span class="font-semibold text-yellow-100">${item.name}</span>
+            container.innerHTML += `
+                <div class="flex items-center justify-between p-1.5 rounded-xl bg-red-950/60 border border-yellow-500/20 text-[11px]">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 text-center font-bold ${medalColor}">#${index + 1}</span>
+                        <span class="font-semibold text-yellow-100">${item.name}</span>
+                    </div>
+                    <span class="text-[10px] text-yellow-300 font-bold">🔥 ${item.streak} Ngày</span>
                 </div>
-                <span class="text-[10px] text-yellow-300 font-bold">🔥 ${item.streak} Ngày</span>
-            </div>
-        `;
+            `;
+            index++;
+        });
     });
 }
 
@@ -193,10 +197,10 @@ function checkCheckinStatus() {
     }
 }
 
-checkinBtn.onclick = function() {
+checkinBtn.onclick = async function() {
     const username = localStorage.getItem('tet_current_user');
     if (!username) {
-        showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản đã đăng ký trước khi điểm danh!", "fa-user-lock");
+        showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản trước khi điểm danh!", "fa-user-lock");
         return;
     }
     const today = new Date().toDateString();
@@ -209,18 +213,89 @@ checkinBtn.onclick = function() {
 
     localStorage.setItem('tet_last_checkin_' + username, today);
     
-    let data = JSON.parse(localStorage.getItem('tet_leaderboard')) || [];
-    let user = data.find(i => i.name === username);
-    if (user) {
-        user.streak += 1;
-    } else {
-        data.push({ name: username, streak: 1 });
+    try {
+        const ref = db.collection('tet_leaderboard').doc(username);
+        const doc = await ref.get();
+        if (doc.exists) {
+            await ref.update({ streak: doc.data().streak + 1 });
+        } else {
+            await ref.set({ name: username, streak: 1 });
+        }
+        checkCheckinStatus();
+        showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã tăng ngày streak trên bảng vàng toàn cầu!`, "fa-award");
+    } catch (e) {
+        showModal("Lỗi", "Không thể ghi điểm danh lên cloud.");
     }
-    localStorage.setItem('tet_leaderboard', JSON.stringify(data));
+};
+
+// --- PHÒNG CHAT CHUNG REALTIME ---
+function loadChatRealtime() {
+    const box = document.getElementById('chatMessagesBox');
+    const now = Date.now();
     
-    checkCheckinStatus();
-    loadLeaderboard();
-    showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh tăng ngày streak trên bảng vàng!`, "fa-award");
+    db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
+        let htmlContent = `
+            <div class="flex items-start gap-2">
+                <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">AD</div>
+                <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
+                    <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
+                    <div class="text-red-100 text-[11px]">Chào mọi người! Tin nhắn đồng bộ trực tuyến toàn cầu! 🎉</div>
+                    <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
+                </div>
+            </div>
+        `;
+        const current = localStorage.getItem('tet_current_user');
+        
+        snapshot.forEach(doc => {
+            const msg = doc.data();
+            // Lọc tự động xóa tin nhắn sau 5 phút (300000 ms)
+            if ((Date.now() - msg.timestamp) < 300000) {
+                const isSelf = msg.sender === current;
+                const avatarChar = msg.sender.charAt(0).toUpperCase();
+                const avatarBg = isSelf ? 'bg-amber-500/30 border-amber-400 text-yellow-200' : 'bg-red-500/30 border-red-400 text-yellow-300';
+                const bubbleBg = isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none';
+
+                htmlContent += `
+                    <div class="flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}">
+                        <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">${avatarChar}</div>
+                        <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow">
+                            <div class="text-[9px] ${isSelf ? 'text-amber-300' : 'text-yellow-400'} font-bold mb-0.5">${msg.sender}</div>
+                            <div class="text-red-100 text-[11px] break-words">${msg.text}</div>
+                            <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${msg.time}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        box.innerHTML = htmlContent;
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+document.getElementById('chatForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const username = localStorage.getItem('tet_current_user');
+    if (!username) {
+        showModal("Yêu Cầu Đăng Nhập", "Bạn cần đăng nhập tài khoản để nhắn tin trò chuyện!", "fa-user-lock");
+        return;
+    }
+
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+        await db.collection('tet_chat').add({
+            sender: username,
+            text: text,
+            time: timeStr,
+            timestamp: Date.now()
+        });
+        input.value = "";
+    } catch (err) {
+        showModal("Lỗi", "Không thể gửi tin nhắn lên server.");
+    }
 };
 
 const queList = [
@@ -239,78 +314,6 @@ document.getElementById('rutQueBtn').onclick = function() {
 document.getElementById('supportBtn').onclick = function() {
     window.open(MY_LINK4M_URL, '_blank');
 };
-
-// --- PHÒNG CHAT CHUNG ---
-const chatForm = document.getElementById('chatForm');
-const chatInput = document.getElementById('chatInput');
-const chatMessagesBox = document.getElementById('chatMessagesBox');
-
-function getChatHistory() {
-    let history = JSON.parse(localStorage.getItem('tet_chat')) || [];
-    const now = Date.now();
-    return history.filter(msg => (now - msg.timestamp) < 300000);
-}
-
-function loadChat() {
-    const history = getChatHistory();
-    let htmlContent = `
-        <div class="flex items-start gap-2">
-            <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">
-                AD
-            </div>
-            <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
-                <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
-                <div class="text-red-100 text-[11px]">Chào các anh đẹp trai! Tin nhắn tự động xoá sau 5 phút nhé! 🎉</div>
-                <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
-            </div>
-        </div>
-    `;
-    const current = localStorage.getItem('tet_current_user');
-    history.forEach(msg => {
-        const isSelf = msg.sender === current;
-        const avatarChar = msg.sender.charAt(0).toUpperCase();
-        const avatarBg = isSelf ? 'bg-amber-500/30 border-amber-400 text-yellow-200' : 'bg-red-500/30 border-red-400 text-yellow-300';
-        const bubbleBg = isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none';
-
-        htmlContent += `
-            <div class="flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}">
-                <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">
-                    ${avatarChar}
-                </div>
-                <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow">
-                    <div class="text-[9px] ${isSelf ? 'text-amber-300' : 'text-yellow-400'} font-bold mb-0.5">${msg.sender}</div>
-                    <div class="text-red-100 text-[11px] break-words">${msg.text}</div>
-                    <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${msg.time}</div>
-                </div>
-            </div>
-        `;
-    });
-    chatMessagesBox.innerHTML = htmlContent;
-    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
-}
-
-chatForm.onsubmit = function(e) {
-    e.preventDefault();
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    const username = localStorage.getItem('tet_current_user');
-    if (!username) {
-        showModal("Yêu Cầu Đăng Nhập", "Bạn cần đăng nhập tài khoản hợp lệ để nhắn tin trò chuyện!", "fa-user-lock");
-        return;
-    }
-
-    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    let history = getChatHistory();
-    history.push({ sender: username, text: text, time: timeStr, timestamp: Date.now() });
-    
-    if (history.length > 50) history = history.slice(history.length - 50);
-    localStorage.setItem('tet_chat', JSON.stringify(history));
-    loadChat();
-    chatInput.value = "";
-};
-
-setInterval(loadChat, 10000);
 
 // Pháo hoa siêu nhẹ chống lag
 const canvas = document.getElementById('fireworksCanvas');
