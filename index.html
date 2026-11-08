@@ -35,7 +35,7 @@
     </script>
 
     <style>
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #2b0404; }
         ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
         
@@ -199,7 +199,7 @@
                 </p>
             </section>
 
-            <!-- Interactive Features Section & Leaderboard -->
+            <!-- Grid Tính năng chính & Khung Chat Telegram & Leaderboard -->
             <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 <!-- Cột trái: Các tính năng tương tác -->
@@ -256,47 +256,68 @@
                         </button>
                     </section>
 
-                    <!-- 4. Tạo Thiệp Chúc Tết -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col items-center justify-between text-center relative">
+                    <!-- 4. Bảng Vàng Xông Đất Thực Tế -->
+                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center relative">
                         <div>
                             <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
-                                <i class="fa-solid fa-envelope-open-text"></i>
+                                <i class="fa-solid fa-trophy text-yellow-400"></i>
                             </div>
-                            <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Thiệp Tết</h3>
-                            <p class="text-xs text-red-200 mb-2">Tạo thiệp chúc mừng.</p>
+                            <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Bảng Vàng</h3>
+                            <p class="text-xs text-red-200 mb-3">Thành viên xông đất sớm nhất.</p>
                         </div>
-                        <div class="w-full space-y-2 my-1">
-                            <input type="text" id="senderNameInput" placeholder="Tên của bạn..." class="w-full px-2.5 py-1.5 rounded-lg bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-[11px] focus:outline-none">
+                        <div id="leaderboardList" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] max-h-32 overflow-y-auto space-y-1 w-full">
+                            <div class="text-center text-red-300/60">Chưa có ai điểm danh.</div>
                         </div>
-                        <button id="createCardBtn" class="w-full py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-yellow-300 font-bold uppercase text-[11px] shadow-lg transition mt-2">
-                            Tạo Thiệp Ngay
-                        </button>
                     </section>
 
                 </div>
 
-                <!-- Cột phải: Bảng Vàng Xông Đất Thực Tế -->
-                <section class="glass-card rounded-3xl p-5 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl relative">
-                    <div>
-                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-yellow-500/30">
-                            <h3 class="font-serif text-lg font-bold text-yellow-300 flex items-center gap-2">
-                                <i class="fa-solid fa-trophy text-yellow-400 animate-bounce"></i> Bảng Vàng Xông Đất
-                            </h3>
-                            <span class="text-[10px] bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 px-2 py-0.5 rounded-full uppercase font-bold">Thực Tế</span>
+                <!-- Cột phải: KHUNG CHAT TẾT TELEGRAM STYLE -->
+                <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl relative h-[420px]">
+                    
+                    <!-- Header Chat Telegram -->
+                    <div class="flex items-center justify-between pb-3 border-b border-yellow-500/30">
+                        <div class="flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                <i class="fa-paper-plane"></i>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-serif text-sm font-bold text-yellow-300 leading-tight">Phòng Chat Tết Đinh Mùi</h3>
+                                <span class="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến
+                                </span>
+                            </div>
                         </div>
-                        <p class="text-[11px] text-red-200 mb-3 italic">Thành viên điểm danh nhận lì xì:</p>
-                        
-                        <!-- Danh sách BXH thực tế -->
-                        <div id="leaderboardList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-                            <div class="text-center text-xs text-yellow-200/60 py-4">Chưa có ai điểm danh. Hãy là người đầu tiên!</div>
+                        <button id="testThankyouBtn" class="text-[10px] text-yellow-300/80 underline hover:text-yellow-300">
+                            Cảm ơn
+                        </button>
+                    </div>
+
+                    <!-- Khung Nội Dung Tin Nhắn (Cuộn) -->
+                    <div id="chatMessagesBox" class="flex-grow my-3 overflow-y-auto space-y-3 pr-1 text-xs">
+                        <!-- Tin nhắn chào mừng mặc định -->
+                        <div class="flex items-start gap-2">
+                            <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">
+                                AD
+                            </div>
+                            <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
+                                <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
+                                <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Chúc mừng năm mới Đinh Mùi 2027! 🎉</div>
+                                <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-yellow-500/20 text-center">
-                        <button id="testThankyouBtn" class="text-[11px] text-yellow-300/80 underline hover:text-yellow-300 transition">
-                            ✨ Xem Giao Diện Cảm Ơn
-                        </button>
+                    <!-- Khung Nhập Tin Nhắn Telegram Style -->
+                    <div class="pt-2 border-t border-yellow-500/20">
+                        <form id="chatForm" class="flex items-center gap-2">
+                            <input type="text" id="chatInput" placeholder="Nhập lời chúc / tin nhắn..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-xs focus:outline-none focus:border-yellow-400">
+                            <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-red-950 font-bold flex items-center justify-center shadow-lg transition active:scale-95 flex-shrink-0">
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                            </button>
+                        </form>
                     </div>
+
                 </section>
 
             </div>
@@ -410,6 +431,8 @@
                 thankyouSection.classList.remove('hidden');
             }
             loadLeaderboard();
+            loadChatHistory();
+            checkCheckinStatus();
         });
 
         // Popup Năn Nỉ Cute
@@ -460,7 +483,70 @@
             }
         });
 
-        // --- HỆ THỐNG BẢNG VÀNG THỰC TẾ (Lưu trên LocalStorage) ---
+        // --- KHUNG CHAT TELEGRAM STYLE ---
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessagesBox = document.getElementById('chatMessagesBox');
+
+        function getChatHistory() {
+            return JSON.parse(localStorage.getItem('tet_chat_messages')) || [];
+        }
+
+        function saveChatHistory(messages) {
+            localStorage.setItem('tet_chat_messages', JSON.stringify(messages));
+        }
+
+        function loadChatHistory() {
+            const history = getChatHistory();
+            history.forEach(msg => appendMessageUI(msg.sender, msg.text, msg.time, msg.isSelf));
+        }
+
+        function appendMessageUI(sender, text, time, isSelf = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}`;
+            
+            const avatarChar = sender.charAt(0).toUpperCase();
+            const avatarBg = isSelf ? 'bg-amber-500/30 border-amber-400 text-yellow-200' : 'bg-red-500/30 border-red-400 text-yellow-300';
+            const bubbleBg = isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none';
+
+            msgDiv.innerHTML = `
+                <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                    ${avatarChar}
+                </div>
+                <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow">
+                    <div class="text-[9px] ${isSelf ? 'text-amber-300' : 'text-yellow-400'} font-bold mb-0.5">${sender}</div>
+                    <div class="text-red-100 text-[11px] break-words">${text}</div>
+                    <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${time}</div>
+                </div>
+            `;
+            chatMessagesBox.appendChild(msgDiv);
+            chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const username = localStorage.getItem('tet_username');
+            if (!username) {
+                showModal("Yêu Cầu Đăng Nhập", "Bạn cần Đăng nhập tài khoản trước khi trò chuyện cùng mọi người nhé!", "fa-user-lock");
+                document.getElementById('authModal').classList.remove('hidden');
+                return;
+            }
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            appendMessageUI(username, text, timeStr, true);
+
+            const history = getChatHistory();
+            history.push({ sender: username, text: text, time: timeStr, isSelf: true });
+            saveChatHistory(history);
+
+            chatInput.value = "";
+            triggerFireworkBurst();
+        });
+
+        // --- HỆ THỐNG BẢNG VÀNG THỰC TẾ ---
         function getLeaderboard() {
             return JSON.parse(localStorage.getItem('tet_real_leaderboard')) || [];
         }
@@ -474,7 +560,7 @@
             const data = getLeaderboard();
             
             if (data.length === 0) {
-                listContainer.innerHTML = `<div class="text-center text-xs text-yellow-200/60 py-4">Chưa có ai điểm danh. Hãy là người đầu tiên!</div>`;
+                listContainer.innerHTML = `<div class="text-center text-xs text-red-300/60 py-2">Chưa có ai điểm danh.</div>`;
                 return;
             }
 
@@ -486,16 +572,13 @@
                 else if(index === 2) medalColor = "text-amber-600 font-bold";
 
                 const row = document.createElement('div');
-                row.className = "flex items-center justify-between p-2 rounded-xl bg-red-950/60 border border-yellow-500/20 text-xs";
+                row.className = "flex items-center justify-between p-1.5 rounded-xl bg-red-950/60 border border-yellow-500/20 text-[11px]";
                 row.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="w-5 text-center ${medalColor}">#${index + 1}</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-4 text-center ${medalColor}">#${index + 1}</span>
                         <span class="font-semibold text-yellow-100">${item.name}</span>
                     </div>
-                    <div class="text-right">
-                        <span class="text-[10px] text-yellow-300 font-bold block">${item.lixi}</span>
-                        <span class="text-[9px] text-red-300/80">${item.time}</span>
-                    </div>
+                    <span class="text-[9px] text-yellow-300 font-bold">${item.lixi}</span>
                 `;
                 listContainer.appendChild(row);
             });
@@ -503,9 +586,8 @@
 
         function addCheckinToLeaderboard(username) {
             let data = getLeaderboard();
-            // Kiểm tra xem user này đã điểm danh chưa, nếu rồi thì cập nhật giờ
             const existingIndex = data.findIndex(i => i.name === username);
-            const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " Hôm nay";
+            const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
             if (existingIndex !== -1) {
                 data[existingIndex].time = nowStr;
@@ -521,15 +603,20 @@
         const checkinStatusBox = document.getElementById('checkinStatusBox');
 
         function checkCheckinStatus() {
-            const lastCheckin = localStorage.getItem('tet_last_checkin');
+            const username = localStorage.getItem('tet_username');
             const today = new Date().toDateString();
-            if (lastCheckin === today) {
+            const lastCheckinUser = localStorage.getItem('tet_last_checkin_' + username);
+
+            if (username && lastCheckinUser === today) {
                 checkinStatusBox.innerText = "✅ Hôm nay đã điểm danh!";
                 checkinBtn.innerText = "Đã Điểm Danh";
                 checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                checkinStatusBox.innerText = "Chưa điểm danh...";
+                checkinBtn.innerText = "Điểm Danh Ngay";
+                checkinBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
-        checkCheckinStatus();
 
         checkinBtn.addEventListener('click', () => {
             const username = localStorage.getItem('tet_username');
@@ -538,13 +625,15 @@
                 document.getElementById('authModal').classList.remove('hidden');
                 return;
             }
-            const lastCheckin = localStorage.getItem('tet_last_checkin');
             const today = new Date().toDateString();
-            if (lastCheckin === today) {
+            const lastCheckinUser = localStorage.getItem('tet_last_checkin_' + username);
+
+            if (lastCheckinUser === today) {
                 showModal("Thông Báo", "Hôm nay bạn đã điểm danh rồi, hãy quay lại vào ngày mai nhé!", "fa-circle-exclamation");
                 return;
             }
-            localStorage.setItem('tet_last_checkin', today);
+            
+            localStorage.setItem('tet_last_checkin_' + username, today);
             checkinStatusBox.innerText = `🎉 Điểm danh thành công!`;
             checkinBtn.innerText = "Đã Điểm Danh";
             checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -629,6 +718,7 @@
             document.getElementById('userDisplayName').innerText = username;
             authModal.classList.add('hidden');
             showModal("Đăng Nhập Thành Công", `Chào mừng bạn trở lại, ${username}!`, "fa-face-smile-beam");
+            checkCheckinStatus();
         });
 
         document.getElementById('submitRegister').addEventListener('click', () => {
@@ -653,12 +743,14 @@
             document.getElementById('userDisplayName').innerText = name;
             authModal.classList.add('hidden');
             showModal("Đăng Ký Thành Công", `Chào mừng thành viên mới ${name} gia nhập đại gia đình Tết 2027!`, "fa-champagne-glasses");
+            checkCheckinStatus();
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('tet_username');
             document.getElementById('userDisplayName').innerText = 'Đăng Nhập';
             userDropdownMenu.classList.add('hidden');
+            checkCheckinStatus();
             showModal("Đăng Xuất", "Đã đăng xuất tài khoản thành công khỏi thiết bị.", "fa-right-from-bracket");
         });
 
