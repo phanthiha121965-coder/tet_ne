@@ -56,7 +56,7 @@ function checkAndShowCutePopup() {
         setTimeout(() => {
             const cutePopup = document.getElementById('cutePopup');
             if (cutePopup) cutePopup.classList.remove('hidden');
-        }, 15000); // Hiện sau 15 giây truy cập web
+        }, 15000);
     }
 }
 
@@ -267,7 +267,7 @@ document.getElementById('submitAdminLogin').onclick = function() {
 };
 
 function renderAdminControlBtn() {
-    if (localStorage.getItem('tet_is_admin'] === 'true') {
+    if (localStorage.getItem('tet_is_admin') === 'true') {
         if (!document.getElementById('openEnterpriseAdminBtn')) {
             const btnHtml = `
                 <div class="fixed bottom-20 right-4 z-[9998]">
@@ -475,7 +475,6 @@ window.unbanEntDevice = async function(deviceId) {
     }
 }
 
-// Cập nhật tin nhắn hệ thống từ Admin
 window.updateSystemWelcomeMessage = async function() {
     const newMsg = prompt("Nhập nội dung thông báo hệ thống mới cho khung chat:");
     if (!newMsg) return;
@@ -506,18 +505,27 @@ window.onclick = function(e) {
     if (!document.getElementById('authStatusContainer').contains(e.target)) { document.getElementById('userDropdownMenu').classList.add('hidden'); }
 };
 
-// --- BẢNG VÀNG ĐỒNG BỘ REALTIME ---
+// --- BẢNG VÀNG AN TOÀN (Tự động sắp xếp client-side, chống lỗi đứng hình) ---
 function loadLeaderboardRealtime() {
-    db.collection('tet_leaderboard').orderBy('streak', 'desc').onSnapshot(snapshot => {
-        const container = document.getElementById('leaderboardList');
+    const container = document.getElementById('leaderboardList');
+    if (!container) return;
+
+    db.collection('tet_leaderboard').onSnapshot(snapshot => {
         container.innerHTML = "";
         if (snapshot.empty) {
             container.innerHTML = `<div class="text-center text-red-300/60">Chưa có ai điểm danh.</div>`;
             return;
         }
-        let index = 0;
+        let items = [];
         snapshot.forEach(doc => {
-            const item = doc.data();
+            let data = doc.data();
+            data.id = doc.id;
+            items.push(data);
+        });
+        items.sort((a, b) => (b.streak || 0) - (a.streak || 0));
+
+        let index = 0;
+        items.forEach(item => {
             let medalColor = "text-yellow-300";
             if(index === 0) medalColor = "text-yellow-400 font-extrabold";
             else if(index === 1) medalColor = "text-gray-300 font-bold";
@@ -534,6 +542,9 @@ function loadLeaderboardRealtime() {
             `;
             index++;
         });
+    }, error => {
+        console.error("Lỗi tải bảng vàng:", error);
+        container.innerHTML = `<div class="text-center text-red-400 text-xs">Không thể tải dữ liệu bảng vàng.</div>`;
     });
 }
 
@@ -596,9 +607,8 @@ checkinBtn.onclick = async function() {
     }
 };
 
-// --- PHÒNG CHAT CHUNG REALTIME (Hỗ trợ đổi thông báo động từ Admin) ---
+// --- PHÒNG CHAT CHUNG AN TOÀN (Tải thông báo động & tin nhắn chống treo) ---
 function loadChatRealtime() {
-    // 1. Lắng nghe thông báo hệ thống từ collection 'settings'
     db.collection('settings').doc('systemConfig').onSnapshot(doc => {
         let welcomeText = "Chào anh em! Chúc mừng năm mới Đinh Mùi 2027 an khang thịnh vượng! 🎉";
         if (doc.exists && doc.data().welcomeMessage) {
@@ -606,13 +616,16 @@ function loadChatRealtime() {
         }
         window.currentWelcomeMsg = welcomeText;
         renderChatMessages();
-    });
+    }, err => { console.log("Lỗi tải thông báo hệ thống"); });
 
-    // 2. Lắng nghe tin nhắn chat từ người dùng
-    db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(async snapshot => {
+    db.collection('tet_chat').onSnapshot(async snapshot => {
         await checkMyBanStatus();
         window.latestChatSnapshot = snapshot;
         renderChatMessages();
+    }, error => {
+        console.error("Lỗi tải chat:", error);
+        const box = document.getElementById('chatMessagesBox');
+        if(box) box.innerHTML = `<div class="text-center text-red-400 text-xs p-4">Không thể tải khung chat.</div>`;
     });
 }
 
@@ -639,11 +652,18 @@ function renderChatMessages() {
     const snapshot = window.latestChatSnapshot;
     const current = localStorage.getItem('tet_current_user');
     
-    if (snapshot) {
+    if (snapshot && !snapshot.empty) {
+        let msgs = [];
         snapshot.forEach(doc => {
-            const msg = doc.data();
-            const msgId = doc.id;
-            if ((Date.now() - msg.timestamp) < 300000) {
+            let d = doc.data();
+            d.id = doc.id;
+            msgs.push(d);
+        });
+        msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+        msgs.forEach(msg => {
+            const msgId = msg.id;
+            if ((Date.now() - (msg.timestamp || 0)) < 300000) {
                 const isOwnerAdmin = msg.sender.includes('Admin') || msg.sender.includes('TỐI CAO');
                 const isSelf = msg.sender === current;
                 
