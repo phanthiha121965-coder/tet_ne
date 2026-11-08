@@ -339,10 +339,10 @@ function checkCheckinStatus() {
     }
 }
 
-// --- PHÒNG CHAT CHUNG REALTIME (Đã tối ưu lại giao diện chữ TỐI CAO cùng 1 hàng) ---
+// --- PHÒNG CHAT CHUNG REALTIME ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
-    const isAdmin = localStorage.getItem('tet_is_admin'] === 'true';
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true'; // Đã sửa lỗi cú pháp ở đây
     
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
         let htmlContent = `
@@ -406,7 +406,7 @@ window.deleteChatMessage = async function(msgId) {
     }
 }
 
-// --- HỆ THỐNG GỬI TIN NHẮN (Kiểm tra khóa tài khoản theo cả Tên và Email) ---
+// --- HỆ THỐNG GỬI TIN NHẮN ---
 let chatTimestamps = [];
 
 document.getElementById('chatForm').onsubmit = async function(e) {
@@ -422,9 +422,8 @@ document.getElementById('chatForm').onsubmit = async function(e) {
         return;
     }
 
-    const isAdmin = localStorage.getItem('tet_is_admin'] === 'true';
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true'; // Đã sửa lỗi cú pháp ở đây
 
-    // Kiểm tra trạng thái bị khóa trực tiếp từ Firestore theo email hoặc tên
     if (!isAdmin) {
         try {
             let userDoc = null;
@@ -432,7 +431,6 @@ document.getElementById('chatForm').onsubmit = async function(e) {
                 userDoc = await db.collection('tet_users').doc(email).get();
             }
             if (!userDoc || !userDoc.exists) {
-                // Thử query theo tên nếu chưa có email lưu trong local
                 const q = await db.collection('tet_users').where('name', '==', username).get();
                 if (!q.empty) {
                     userDoc = q.docs[0];
