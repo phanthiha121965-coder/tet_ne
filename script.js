@@ -50,19 +50,17 @@ document.getElementById('modalCloseBtn').onclick = () => {
 // --- HỆ THỐNG POPUP NĂN NỈ CUTE 1 LẦN/NGÀY ---
 function checkAndShowCutePopup() {
     const lastShownDate = localStorage.getItem('cutePopupShownDate');
-    const today = new Date().toDateString(); // Lấy ngày hiện tại
+    const today = new Date().toDateString();
 
-    // Nếu hôm nay chưa hiện thì cho hiện ngẫu nhiên sau khoảng vài giây (hoặc mô phỏng 3-4 phút tuỳ chỉnh)
     if (lastShownDate !== today) {
         setTimeout(() => {
             const cutePopup = document.getElementById('cutePopup');
             if (cutePopup) cutePopup.classList.remove('hidden');
-        }, 15000); // Xuất hiện sau 15 giây truy cập web
+        }, 15000); // Hiện sau 15 giây truy cập web
     }
 }
 
 document.getElementById('popupAcceptBtn')?.addEventListener('click', () => {
-    // Lưu lại trạng thái hôm nay đã vượt link ủng hộ
     localStorage.setItem('cutePopupShownDate', new Date().toDateString());
     document.getElementById('cutePopup').classList.add('hidden');
     window.open(MY_LINK4M_URL, '_blank');
@@ -269,7 +267,7 @@ document.getElementById('submitAdminLogin').onclick = function() {
 };
 
 function renderAdminControlBtn() {
-    if (localStorage.getItem('tet_is_admin') === 'true') {
+    if (localStorage.getItem('tet_is_admin'] === 'true') {
         if (!document.getElementById('openEnterpriseAdminBtn')) {
             const btnHtml = `
                 <div class="fixed bottom-20 right-4 z-[9998]">
@@ -297,6 +295,7 @@ function openEnterpriseAdminDashboard() {
                     <span class="font-extrabold text-xs md:text-sm text-yellow-300 tracking-wider">TET 2027 ADMIN PANEL</span>
                 </div>
                 <div class="flex items-center gap-2 text-xs">
+                    <button onclick="updateSystemWelcomeMessage()" class="bg-yellow-500 hover:bg-yellow-600 text-red-950 font-extrabold px-2.5 py-1 rounded-lg transition shadow text-[11px]">💬 Đổi Thông Báo</button>
                     <button id="closeEnterprisePage" class="bg-red-700 hover:bg-red-800 text-white font-bold px-2.5 py-1 rounded-lg transition shadow text-[11px]">Thoát</button>
                 </div>
             </div>
@@ -476,9 +475,24 @@ window.unbanEntDevice = async function(deviceId) {
     }
 }
 
+// Cập nhật tin nhắn hệ thống từ Admin
+window.updateSystemWelcomeMessage = async function() {
+    const newMsg = prompt("Nhập nội dung thông báo hệ thống mới cho khung chat:");
+    if (!newMsg) return;
+
+    try {
+        await db.collection('settings').doc('systemConfig').set({
+            welcomeMessage: newMsg
+        }, { merge: true });
+        alert("Đã cập nhật tin nhắn hệ thống thành công! Mọi người vào web sẽ thấy ngay.");
+    } catch (e) {
+        alert("Lỗi khi cập nhật: " + e.message);
+    }
+};
+
 window.onload = function() {
     checkMyBanStatus(); 
-    checkAndShowCutePopup(); // Kiểm tra bật popup năn nỉ 1 lần/ngày
+    checkAndShowCutePopup(); 
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
     renderAdminControlBtn();
@@ -582,28 +596,50 @@ checkinBtn.onclick = async function() {
     }
 };
 
-// --- PHÒNG CHAT CHUNG REALTIME ---
+// --- PHÒNG CHAT CHUNG REALTIME (Hỗ trợ đổi thông báo động từ Admin) ---
 function loadChatRealtime() {
-    const box = document.getElementById('chatMessagesBox');
-    
+    // 1. Lắng nghe thông báo hệ thống từ collection 'settings'
+    db.collection('settings').doc('systemConfig').onSnapshot(doc => {
+        let welcomeText = "Chào anh em! Chúc mừng năm mới Đinh Mùi 2027 an khang thịnh vượng! 🎉";
+        if (doc.exists && doc.data().welcomeMessage) {
+            welcomeText = doc.data().welcomeMessage;
+        }
+        window.currentWelcomeMsg = welcomeText;
+        renderChatMessages();
+    });
+
+    // 2. Lắng nghe tin nhắn chat từ người dùng
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(async snapshot => {
         await checkMyBanStatus();
-        
-        let htmlContent = `
-            <div class="flex items-start gap-2">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-300 border-2 border-white flex items-center justify-center text-red-950 font-black text-xs flex-shrink-0 shadow-lg animate-pulse">👑</div>
-                <div class="bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border-2 border-yellow-400 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow-2xl">
-                    <div class="text-[10px] text-yellow-300 font-black mb-1 flex items-center gap-1 flex-wrap tracking-wider">
-                        <span>👑 ADMIN DUNGHOET</span> 
-                        <span class="bg-yellow-400 text-red-950 px-1.5 py-0.2 rounded text-[8px] font-extrabold shadow">TỐI CAO</span>
-                    </div>
-                    <div class="text-yellow-100 text-xs font-semibold">Chào anh em! Hệ thống bảo mật toàn quyền đã kích hoạt. 🎉</div>
-                    <div class="text-[8px] text-yellow-300/70 text-right mt-1">Vừa xong</div>
+        window.latestChatSnapshot = snapshot;
+        renderChatMessages();
+    });
+}
+
+function renderChatMessages() {
+    const box = document.getElementById('chatMessagesBox');
+    if (!box) return;
+
+    let welcomeText = window.currentWelcomeMsg || "Chào anh em! Chúc mừng năm mới Đinh Mùi 2027 an khang thịnh vượng! 🎉";
+
+    let htmlContent = `
+        <div class="flex items-start gap-2">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-300 border-2 border-white flex items-center justify-center text-red-950 font-black text-xs flex-shrink-0 shadow-lg animate-pulse">👑</div>
+            <div class="bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border-2 border-yellow-400 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow-2xl">
+                <div class="text-[10px] text-yellow-300 font-black mb-1 flex items-center gap-1 flex-wrap tracking-wider">
+                    <span>👑 ADMIN DUNGHOET</span> 
+                    <span class="bg-yellow-400 text-red-950 px-1.5 py-0.2 rounded text-[8px] font-extrabold shadow">TỐI CAO</span>
                 </div>
+                <div class="text-yellow-100 text-xs font-semibold">${welcomeText}</div>
+                <div class="text-[8px] text-yellow-300/70 text-right mt-1">Thông báo hệ thống</div>
             </div>
-        `;
-        const current = localStorage.getItem('tet_current_user');
-        
+        </div>
+    `;
+
+    const snapshot = window.latestChatSnapshot;
+    const current = localStorage.getItem('tet_current_user');
+    
+    if (snapshot) {
         snapshot.forEach(doc => {
             const msg = doc.data();
             const msgId = doc.id;
@@ -635,9 +671,9 @@ function loadChatRealtime() {
                 `;
             }
         });
-        box.innerHTML = htmlContent;
-        box.scrollTop = box.scrollHeight;
-    });
+    }
+    box.innerHTML = htmlContent;
+    box.scrollTop = box.scrollHeight;
 }
 
 window.deleteChatMessage = async function(msgId) {
