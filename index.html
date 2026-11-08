@@ -93,7 +93,7 @@
                 </div>
                 <h3 id="modalTitle" class="font-serif text-xl font-bold text-yellow-300 mb-2">Thông Báo</h3>
                 <p id="modalMessage" class="text-xs text-red-100 mb-5 leading-relaxed">Nội dung thông báo...</p>
-                <button id="modalCloseBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200">
+                <button id="modalCloseBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">
                     Đã Hiểu / Xác Nhận
                 </button>
             </div>
@@ -110,10 +110,10 @@
                     Các anh đẹp trai có thể bấm ủng hộ em <span class="text-yellow-300 font-bold">1 lần thui</span> được không ạ? Đi mà, giúp em đi mà... 🥺🙏
                 </p>
                 <div class="space-y-2">
-                    <button id="popupAcceptBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200">
+                    <button id="popupAcceptBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">
                         <i class="fa-solid fa-heart mr-1"></i> Bấm Ủng Hộ Ngay (Link4M)
                     </button>
-                    <button id="popupCloseBtn" class="w-full py-2.5 bg-red-950/80 text-red-300 hover:text-white font-semibold rounded-xl text-xs border border-red-500/30 transition">
+                    <button id="popupCloseBtn" class="w-full py-2.5 bg-red-950/80 text-red-300 hover:text-white font-semibold rounded-xl text-xs border border-red-500/30 transition cursor-pointer">
                         Thôi để sau (Đóng)
                     </button>
                 </div>
@@ -123,23 +123,23 @@
         <!-- Nút điều khiển âm thanh & Đăng nhập góc phải -->
         <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
             <div id="authStatusContainer" class="relative">
-                <button id="openAuthModalBtn" class="glass-card hover:bg-yellow-500/20 text-yellow-300 px-3 sm:px-4 h-12 rounded-full flex items-center gap-2 transition border border-yellow-500/50 shadow-lg text-xs sm:text-sm font-semibold active:scale-95 cursor-pointer">
+                <button id="openAuthModalBtn" style="background-color: rgba(88, 10, 10, 0.95); border: 2px solid #fbbf24; color: #fde68a;" class="px-4 h-12 rounded-full flex items-center gap-2 shadow-2xl text-xs sm:text-sm font-bold active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-user-circle text-lg"></i>
                     <span id="userDisplayName">Đăng Nhập</span>
                 </button>
                 
-                <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-2 border border-yellow-500/50 shadow-2xl hidden">
-                    <button id="logoutBtn" class="w-full text-left px-3 py-2 rounded-xl text-red-200 hover:bg-red-800/60 hover:text-yellow-300 text-xs font-bold transition flex items-center gap-2">
+                <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-2 border border-yellow-500/50 shadow-2xl hidden z-50">
+                    <button id="logoutBtn" class="w-full text-left px-3 py-2 rounded-xl text-red-200 hover:bg-red-800/60 hover:text-yellow-300 text-xs font-bold transition flex items-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất (Thoát)
                     </button>
                 </div>
             </div>
 
-            <button id="fireworksToggleBtn" title="Bắn pháo hoa ngay" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95">
+            <button id="fireworksToggleBtn" title="Bắn pháo hoa ngay" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95 cursor-pointer">
                 <i class="fa-solid fa-burst text-xl animate-bounce"></i>
             </button>
             
-            <button id="musicToggleBtn" title="Bật/Tắt Nhạc Tết" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95">
+            <button id="musicToggleBtn" title="Bật/Tắt Nhạc Tết" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95 cursor-pointer">
                 <i id="musicIcon" class="fa-solid fa-music text-lg"></i>
             </button>
         </div>
@@ -217,7 +217,7 @@
                         <div id="checkinStatusBox" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
                             Chưa điểm danh...
                         </div>
-                        <button id="checkinBtn" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        <button id="checkinBtn" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] shadow-lg transition mt-2 cursor-pointer">
                             Điểm Danh Ngay
                         </button>
                     </section>
@@ -234,7 +234,7 @@
                         <div id="queResultBox" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
                             Thỉnh quẻ đầu năm...
                         </div>
-                        <button id="rutQueBtn" class="w-full py-2.5 px-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        <button id="rutQueBtn" class="w-full py-2.5 px-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2 cursor-pointer">
                             Rút Quẻ Ngay
                         </button>
                     </section>
@@ -251,7 +251,7 @@
                         <div class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
                             Cảm ơn các anh đẹp trai! ❤️
                         </div>
-                        <button id="supportBtn" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        <button id="supportBtn" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2 cursor-pointer">
                             <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Bấm Ủng Hộ Ngay
                         </button>
                     </section>
@@ -284,25 +284,24 @@
                             <div class="text-left">
                                 <h3 class="font-serif text-sm font-bold text-yellow-300 leading-tight">Phòng Chat Tết Đinh Mùi</h3>
                                 <span class="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến (Tự xoá tin nhắn sau 5 phút)
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến (Xoá sau 5 phút)
                                 </span>
                             </div>
                         </div>
-                        <button id="testThankyouBtn" class="text-[10px] text-yellow-300/80 underline hover:text-yellow-300">
+                        <button id="testThankyouBtn" class="text-[10px] text-yellow-300/80 underline hover:text-yellow-300 cursor-pointer">
                             Cảm ơn
                         </button>
                     </div>
 
                     <!-- Khung Nội Dung Tin Nhắn (Cuộn) -->
                     <div id="chatMessagesBox" class="flex-grow my-3 overflow-y-auto space-y-3 pr-1 text-xs">
-                        <!-- Tin nhắn chào mừng mặc định -->
                         <div class="flex items-start gap-2">
                             <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">
                                 AD
                             </div>
                             <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
                                 <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
-                                <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Tin nhắn sẽ tự động dọn dẹp sau 5 phút nhé! 🎉</div>
+                                <div class="text-red-100 text-[11px]">Chào các anh đẹp trai! Tin nhắn tự động xoá sau 5 phút nhé! 🎉</div>
                                 <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
                             </div>
                         </div>
@@ -312,7 +311,7 @@
                     <div class="pt-2 border-t border-yellow-500/20">
                         <form id="chatForm" class="flex items-center gap-2">
                             <input type="text" id="chatInput" placeholder="Nhập lời chúc / tin nhắn..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-xs focus:outline-none focus:border-yellow-400">
-                            <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-red-950 font-bold flex items-center justify-center shadow-lg transition active:scale-95 flex-shrink-0">
+                            <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-red-950 font-bold flex items-center justify-center shadow-lg transition active:scale-95 flex-shrink-0 cursor-pointer">
                                 <i class="fa-solid fa-paper-plane text-xs"></i>
                             </button>
                         </form>
@@ -340,29 +339,30 @@
                 Tuyệt vời quá! Cảm ơn các anh đẹp trai đã vượt link ủng hộ em nha! Chúc các anh và gia đình năm mới <span class="text-yellow-300 font-bold">Đinh Mùi 2027</span> an khang thịnh vượng, vạn sự như ý! 🧧✨
             </p>
 
-            <button id="backToHomeBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-red-950 font-bold uppercase tracking-wider text-xs shadow-xl transition transform active:scale-95 border border-yellow-200">
+            <button id="backToHomeBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-red-950 font-bold uppercase tracking-wider text-xs shadow-xl transition transform active:scale-95 border border-yellow-200 cursor-pointer">
                 <i class="fa-solid fa-house mr-2"></i> Quay Lại Trang Chủ Web Tết
             </button>
         </div>
     </div>
 
     <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
         <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 relative shadow-2xl">
-            <button id="closeAuthModal" class="absolute top-3 right-3 text-yellow-400 hover:text-white w-7 h-7 rounded-full flex items-center justify-center border border-yellow-500/30 text-sm">
+            <button id="closeAuthModal" class="absolute top-3 right-3 text-yellow-400 hover:text-white w-7 h-7 rounded-full flex items-center justify-center border border-yellow-500/30 text-sm cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
+            <!-- 2 Tab Đăng Nhập / Đăng Ký đã fix cứng sự kiện onclick -->
             <div class="flex rounded-xl bg-red-950/90 p-1 border border-yellow-500/40 mb-5">
-                <button id="tabLogin" class="flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition">Đăng Nhập</button>
-                <button id="tabRegister" class="flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition">Đăng Ký</button>
+                <button id="tabLogin" class="flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition cursor-pointer">Đăng Nhập</button>
+                <button id="tabRegister" class="flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition cursor-pointer">Đăng Ký</button>
             </div>
 
             <div id="formLogin" class="space-y-3">
                 <h3 class="font-serif text-xl font-bold text-yellow-300 text-center mb-1">Đăng Nhập Tài Khoản</h3>
                 <input type="email" id="loginEmail" placeholder="Email (vd: abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
                 <input type="password" id="loginPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
-                <button id="submitLogin" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-200 mt-2">
+                <button id="submitLogin" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-200 mt-2 cursor-pointer">
                     Đăng Nhập
                 </button>
             </div>
@@ -372,7 +372,7 @@
                 <input type="text" id="regName" placeholder="Tên hiển thị..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
                 <input type="email" id="regEmail" placeholder="Email hợp lệ (vd: abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
                 <input type="password" id="regPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
-                <button id="submitRegister" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-800 text-yellow-300 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-400/50 mt-2">
+                <button id="submitRegister" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-800 text-yellow-300 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-400/50 mt-2 cursor-pointer">
                     Đăng Ký Ngay
                 </button>
             </div>
@@ -389,9 +389,9 @@
             document.getElementById('modalIcon').className = `fa-solid ${iconClass} text-yellow-300`;
             document.getElementById('customModal').classList.remove('hidden');
         }
-        document.getElementById('modalCloseBtn').addEventListener('click', () => {
+        document.getElementById('modalCloseBtn').onclick = function() {
             document.getElementById('customModal').classList.add('hidden');
-        });
+        };
 
         // Đếm ngược Tết 2027
         const targetDate = new Date('February 6, 2027 00:00:00').getTime();
@@ -414,15 +414,15 @@
         const testThankyouBtn = document.getElementById('testThankyouBtn');
         const backToHomeBtn = document.getElementById('backToHomeBtn');
 
-        testThankyouBtn.addEventListener('click', () => {
+        testThankyouBtn.onclick = function() {
             homeSection.classList.add('hidden');
             thankyouSection.classList.remove('hidden');
-        });
+        };
 
-        backToHomeBtn.addEventListener('click', () => {
+        backToHomeBtn.onclick = function() {
             thankyouSection.classList.add('hidden');
             homeSection.classList.remove('hidden');
-        });
+        };
 
         window.addEventListener('load', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -450,26 +450,26 @@
             setTimeout(showCutePopup, randomDelay);
         }
 
-        popupCloseBtn.addEventListener('click', () => {
+        popupCloseBtn.onclick = function() {
             cutePopup.classList.add('hidden');
             scheduleNextPopup();
-        });
+        };
 
-        popupAcceptBtn.addEventListener('click', () => {
+        popupAcceptBtn.onclick = function() {
             cutePopup.classList.add('hidden');
             window.open(MY_LINK4M_URL, '_blank');
             scheduleNextPopup();
-        });
+        };
 
-        document.getElementById('supportBtn').addEventListener('click', () => {
+        document.getElementById('supportBtn').onclick = function() {
             window.open(MY_LINK4M_URL, '_blank');
-        });
+        };
 
         let isMusicPlaying = true;
         const musicBtn = document.getElementById('musicToggleBtn');
         const musicIcon = document.getElementById('musicIcon');
         
-        musicBtn.addEventListener('click', () => {
+        musicBtn.onclick = function() {
             isMusicPlaying = !isMusicPlaying;
             const iframe = document.getElementById('ytMusicPlayer');
             if (isMusicPlaying) {
@@ -481,9 +481,9 @@
                 musicIcon.className = "fa-solid fa-volume-xmark text-lg";
                 musicBtn.classList.add('opacity-50');
             }
-        });
+        };
 
-        // --- KHUNG CHAT TELEGRAM STYLE (Tự xoá tin nhắn sau 5 phút & giới hạn 50 tin) ---
+        // --- KHUNG CHAT TELEGRAM STYLE (Tự xoá sau 5 phút & tối đa 50 tin) ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessagesBox = document.getElementById('chatMessagesBox');
@@ -491,7 +491,6 @@
         function getChatHistory() {
             let history = JSON.parse(localStorage.getItem('tet_chat_messages')) || [];
             const now = Date.now();
-            // Lọc bỏ các tin nhắn đã quá 5 phút (300,000 ms)
             history = history.filter(msg => (now - msg.timestamp) < 300000);
             return history;
         }
@@ -508,7 +507,7 @@
                     </div>
                     <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
                         <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
-                        <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Tin nhắn sẽ tự động dọn dẹp sau 5 phút nhé! 🎉</div>
+                        <div class="text-red-100 text-[11px]">Chào các anh đẹp trai! Tin nhắn tự động xoá sau 5 phút nhé! 🎉</div>
                         <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
                     </div>
                 </div>
@@ -539,7 +538,7 @@
             chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
         }
 
-        chatForm.addEventListener('submit', (e) => {
+        chatForm.onsubmit = function(e) {
             e.preventDefault();
             const text = chatInput.value.trim();
             if (!text) return;
@@ -559,7 +558,6 @@
             let history = getChatHistory();
             history.push({ sender: username, text: text, time: timeStr, isSelf: true, timestamp: timestamp });
             
-            // Giới hạn lưu tối đa 50 tin nhắn gần nhất
             if (history.length > 50) {
                 history = history.slice(history.length - 50);
             }
@@ -567,9 +565,8 @@
             saveChatHistory(history);
             chatInput.value = "";
             triggerFireworkBurst();
-        });
+        };
 
-        // Kiểm tra dọn dẹp tin nhắn cũ sau mỗi 30 giây
         setInterval(() => {
             loadChatHistory();
         }, 30000);
@@ -646,7 +643,7 @@
             }
         }
 
-        checkinBtn.addEventListener('click', () => {
+        checkinBtn.onclick = function() {
             const username = localStorage.getItem('tet_username');
             if (!username) {
                 showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản trước khi điểm danh xông đất nhé!", "fa-user-lock");
@@ -669,7 +666,7 @@
             addCheckinToLeaderboard(username);
             showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh xông đất thành công và ghi tên lên bảng vàng!`, "fa-award");
             triggerFireworkBurst();
-        });
+        };
 
         const queList = [
             "Quẻ Đại Cát: Công thành danh toạ, tài lộc dồi dào, vạn sự hanh thông suốt cả năm Đinh Mùi!",
@@ -678,20 +675,14 @@
             "Quẻ Tấn Thới: Học hành tiến tới, công danh thăng tiến, gặp dữ hóa lành.",
             "Quẻ Như Ý: Cầu được ước thấy, mọi mưu sự đều đạt kết quả tốt đẹp ngoài mong đợi."
         ];
-        document.getElementById('rutQueBtn').addEventListener('click', () => {
+        document.getElementById('rutQueBtn').onclick = function() {
             const randomQue = queList[Math.floor(Math.random() * queList.length)];
             document.getElementById('queResultBox').innerText = randomQue;
             showModal("Quẻ Thẻ Đầu Năm 2027", randomQue, "fa-scroll");
             triggerFireworkBurst();
-        });
+        };
 
-        document.getElementById('createCardBtn').addEventListener('click', () => {
-            const name = document.getElementById('senderNameInput').value.trim() || "Bạn bè gần xa";
-            showModal("Tạo Thiệp Thành Công", `Đã tạo thiệp chúc Tết cho "${name}"!\n\n"Chúc mừng năm mới Đinh Mùi 2027 - An Khang Thịnh Vượng!"`, "fa-envelope-circle-check");
-            triggerFireworkBurst();
-        });
-
-        // --- XỬ LÝ MODAL ĐĂNG NHẬP / ĐĂNG KÝ (ĐÃ FIX HOÀN CHỈNH) ---
+        // --- XỬ LÝ TAB ĐĂNG NHẬP / ĐĂNG KÝ (ĐÃ FIX CHUẨN XÁC) ---
         const authModal = document.getElementById('authModal');
         const openAuthBtn = document.getElementById('openAuthModalBtn');
         const userDropdownMenu = document.getElementById('userDropdownMenu');
@@ -700,7 +691,7 @@
         const formLogin = document.getElementById('formLogin');
         const formRegister = document.getElementById('formRegister');
 
-        openAuthBtn.addEventListener('click', (e) => {
+        openAuthBtn.onclick = function(e) {
             e.stopPropagation();
             const saved = localStorage.getItem('tet_username');
             if (saved) {
@@ -708,31 +699,33 @@
             } else {
                 authModal.classList.remove('hidden');
             }
-        });
+        };
 
-        document.getElementById('closeAuthModal').addEventListener('click', () => {
+        document.getElementById('closeAuthModal').onclick = function() {
             authModal.classList.add('hidden');
-        });
+        };
 
-        tabLogin.addEventListener('click', () => {
-            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition";
-            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition";
+        // Hàm chuyển sang tab Đăng Nhập
+        tabLogin.onclick = function() {
+            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition cursor-pointer";
+            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition cursor-pointer";
             formLogin.classList.remove('hidden');
             formRegister.classList.add('hidden');
-        });
+        };
 
-        tabRegister.addEventListener('click', () => {
-            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition";
-            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition";
+        // Hàm chuyển sang tab Đăng Ký
+        tabRegister.onclick = function() {
+            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition cursor-pointer";
+            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition cursor-pointer";
             formRegister.classList.remove('hidden');
             formLogin.classList.add('hidden');
-        });
+        };
 
         function isValidEmail(email) {
             return email.endsWith('@gmail.com') && email.length > 10;
         }
 
-        document.getElementById('submitLogin').addEventListener('click', () => {
+        document.getElementById('submitLogin').onclick = function() {
             const email = document.getElementById('loginEmail').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
 
@@ -751,9 +744,9 @@
             authModal.classList.add('hidden');
             showModal("Đăng Nhập Thành Công", `Chào mừng bạn trở lại, ${username}!`, "fa-face-smile-beam");
             checkCheckinStatus();
-        });
+        };
 
-        document.getElementById('submitRegister').addEventListener('click', () => {
+        document.getElementById('submitRegister').onclick = function() {
             const name = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const pass = document.getElementById('regPass').value.trim();
@@ -776,29 +769,29 @@
             authModal.classList.add('hidden');
             showModal("Đăng Ký Thành Công", `Chào mừng thành viên mới ${name} gia nhập đại gia đình Tết 2027!`, "fa-champagne-glasses");
             checkCheckinStatus();
-        });
+        };
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+        document.getElementById('logoutBtn').onclick = function() {
             localStorage.removeItem('tet_username');
             document.getElementById('userDisplayName').innerText = 'Đăng Nhập';
             userDropdownMenu.classList.add('hidden');
             checkCheckinStatus();
             showModal("Đăng Xuất", "Đã đăng xuất tài khoản thành công khỏi thiết bị.", "fa-right-from-bracket");
-        });
+        };
 
-        window.addEventListener('load', () => {
+        window.onload = function() {
             const saved = localStorage.getItem('tet_username');
             if(saved) document.getElementById('userDisplayName').innerText = saved;
-        });
+        };
 
-        window.addEventListener('click', (e) => {
+        window.onclick = function(e) {
             if (e.target === authModal) {
                 authModal.classList.add('hidden');
             }
             if (!document.getElementById('authStatusContainer').contains(e.target)) {
                 userDropdownMenu.classList.add('hidden');
             }
-        });
+        };
 
         // Pháo hoa nền
         const canvas = document.getElementById('fireworksCanvas');
