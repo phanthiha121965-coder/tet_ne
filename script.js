@@ -217,13 +217,21 @@ checkinBtn.onclick = async function() {
         const ref = db.collection('tet_leaderboard').doc(username);
         const doc = await ref.get();
         if (doc.exists) {
-            await ref.update({ streak: doc.data().streak + 1 });
+            const currentStreak = doc.data().streak || 0;
+            await ref.update({ 
+                name: username,
+                streak: currentStreak + 1 
+            });
         } else {
-            await ref.set({ name: username, streak: 1 });
+            await ref.set({ 
+                name: username, 
+                streak: 1 
+            });
         }
         checkCheckinStatus();
         showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã tăng ngày streak trên bảng vàng toàn cầu!`, "fa-award");
     } catch (e) {
+        console.error(e);
         showModal("Lỗi", "Không thể ghi điểm danh lên cloud.");
     }
 };
