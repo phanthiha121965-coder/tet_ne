@@ -123,7 +123,7 @@
         <!-- Nút điều khiển âm thanh & Đăng nhập góc phải -->
         <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
             <div id="authStatusContainer" class="relative">
-                <button id="openAuthModalBtn" class="glass-card hover:bg-yellow-500/20 text-yellow-300 px-3 sm:px-4 h-12 rounded-full flex items-center gap-2 transition border border-yellow-500/50 shadow-lg text-xs sm:text-sm font-semibold active:scale-95">
+                <button id="openAuthModalBtn" class="glass-card hover:bg-yellow-500/20 text-yellow-300 px-3 sm:px-4 h-12 rounded-full flex items-center gap-2 transition border border-yellow-500/50 shadow-lg text-xs sm:text-sm font-semibold active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-user-circle text-lg"></i>
                     <span id="userDisplayName">Đăng Nhập</span>
                 </button>
@@ -284,7 +284,7 @@
                             <div class="text-left">
                                 <h3 class="font-serif text-sm font-bold text-yellow-300 leading-tight">Phòng Chat Tết Đinh Mùi</h3>
                                 <span class="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến (Tự xoá tin nhắn sau 5 phút)
                                 </span>
                             </div>
                         </div>
@@ -302,7 +302,7 @@
                             </div>
                             <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
                                 <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
-                                <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Chúc mừng năm mới Đinh Mùi 2027! 🎉</div>
+                                <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Tin nhắn sẽ tự động dọn dẹp sau 5 phút nhé! 🎉</div>
                                 <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
                             </div>
                         </div>
@@ -483,13 +483,17 @@
             }
         });
 
-        // --- KHUNG CHAT TELEGRAM STYLE ---
+        // --- KHUNG CHAT TELEGRAM STYLE (Tự xoá tin nhắn sau 5 phút & giới hạn 50 tin) ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessagesBox = document.getElementById('chatMessagesBox');
 
         function getChatHistory() {
-            return JSON.parse(localStorage.getItem('tet_chat_messages')) || [];
+            let history = JSON.parse(localStorage.getItem('tet_chat_messages')) || [];
+            const now = Date.now();
+            // Lọc bỏ các tin nhắn đã quá 5 phút (300,000 ms)
+            history = history.filter(msg => (now - msg.timestamp) < 300000);
+            return history;
         }
 
         function saveChatHistory(messages) {
@@ -497,6 +501,18 @@
         }
 
         function loadChatHistory() {
+            chatMessagesBox.innerHTML = `
+                <div class="flex items-start gap-2">
+                    <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">
+                        AD
+                    </div>
+                    <div class="bg-red-950/80 border border-yellow-500/30 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow">
+                        <div class="text-[9px] text-yellow-400 font-bold mb-0.5">Admin Web Tết 🧧</div>
+                        <div class="text-red-100 text-[11px]">Chào mừng các anh đẹp trai gia nhập phòng chat! Tin nhắn sẽ tự động dọn dẹp sau 5 phút nhé! 🎉</div>
+                        <div class="text-[8px] text-red-300/60 text-right mt-1">Vừa xong</div>
+                    </div>
+                </div>
+            `;
             const history = getChatHistory();
             history.forEach(msg => appendMessageUI(msg.sender, msg.text, msg.time, msg.isSelf));
         }
@@ -536,15 +552,27 @@
             }
 
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const timestamp = Date.now();
+
             appendMessageUI(username, text, timeStr, true);
 
-            const history = getChatHistory();
-            history.push({ sender: username, text: text, time: timeStr, isSelf: true });
-            saveChatHistory(history);
+            let history = getChatHistory();
+            history.push({ sender: username, text: text, time: timeStr, isSelf: true, timestamp: timestamp });
+            
+            // Giới hạn lưu tối đa 50 tin nhắn gần nhất
+            if (history.length > 50) {
+                history = history.slice(history.length - 50);
+            }
 
+            saveChatHistory(history);
             chatInput.value = "";
             triggerFireworkBurst();
         });
+
+        // Kiểm tra dọn dẹp tin nhắn cũ sau mỗi 30 giây
+        setInterval(() => {
+            loadChatHistory();
+        }, 30000);
 
         // --- HỆ THỐNG BẢNG VÀNG THỰC TẾ ---
         function getLeaderboard() {
@@ -663,7 +691,7 @@
             triggerFireworkBurst();
         });
 
-        // --- XỬ LÝ MODAL ĐĂNG NHẬP / ĐĂNG KÝ (ĐÃ SỬA CHUẨN XÁC) ---
+        // --- XỬ LÝ MODAL ĐĂNG NHẬP / ĐĂNG KÝ (ĐÃ FIX HOÀN CHỈNH) ---
         const authModal = document.getElementById('authModal');
         const openAuthBtn = document.getElementById('openAuthModalBtn');
         const userDropdownMenu = document.getElementById('userDropdownMenu');
