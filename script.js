@@ -1,15 +1,15 @@
 const MY_LINK4M_URL = "https://link4m.net/JtoYhsH";
 
-// --- CẤU HÌNH FIREBASE CLOUD DATABASE (ONLINE REALTIME) ---
+// --- CẤU HÌNH FIREBASE CLOUD DATABASE THẬT CỦA DŨNG ---
 const firebaseConfig = {
-    apiKey: "AIzaSyD-Tết2027DemoKeyOnlineRealtimeABC",
-    authDomain: "tet2027-online.firebaseapp.com",
-    projectId: "tet2027-online",
-    storageBucket: "tet2027-online.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef"
+    apiKey: "AIzaSyC8oHf9Lhx_r--hsEmUPk9x1Y4u3-TFUEY",
+    authDomain: "tet2027-cfd6f.firebaseapp.com",
+    projectId: "tet2027-cfd6f",
+    storageBucket: "tet2027-cfd6f.firebasestorage.app",
+    messagingSenderId: "167099079711",
+    appId: "1:167099079711:web:c1f300a15462f3eceb092a"
 };
-// Khởi tạo Firebase (Sử dụng Firestore công khai cho dự án web Tết)
+// Khởi tạo Firebase Firestore
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -231,7 +231,6 @@ checkinBtn.onclick = async function() {
 // --- PHÒNG CHAT CHUNG REALTIME ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
-    const now = Date.now();
     
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
         let htmlContent = `
@@ -248,7 +247,6 @@ function loadChatRealtime() {
         
         snapshot.forEach(doc => {
             const msg = doc.data();
-            // Lọc tự động xóa tin nhắn sau 5 phút (300000 ms)
             if ((Date.now() - msg.timestamp) < 300000) {
                 const isSelf = msg.sender === current;
                 const avatarChar = msg.sender.charAt(0).toUpperCase();
