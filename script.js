@@ -137,15 +137,17 @@ document.getElementById('submitLogin').onclick = async function() {
 document.getElementById('logoutBtn').onclick = function() {
     localStorage.removeItem('tet_current_user');
     localStorage.removeItem('tet_is_admin');
+    const adminPanel = document.getElementById('adminDashboardModal');
+    if(adminPanel) adminPanel.remove();
     document.getElementById('userDisplayName').innerText = 'Đăng Nhập';
     document.getElementById('userDropdownMenu').classList.add('hidden');
     checkCheckinStatus();
     showModal("Đã Thoát", "Đã đăng xuất tài khoản khỏi thiết bị.");
 };
 
-// --- BÍ MẬT: BẤM TRÁI TIM 10 LẦN MỞ ADMIN PANEL ---
+// --- GIAO DIỆN ADMIN & BÍ MẬT BẤM TRÁI TIM 10 LẦN ---
 let heartClickCount = 0;
-const adminModalHTML = `
+const adminModalsHTML = `
     <div id="adminLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center hidden z-[99999]">
         <div class="bg-gradient-to-b from-red-900 to-red-950 border-2 border-yellow-400 p-6 rounded-2xl w-[90%] max-w-sm text-center shadow-2xl relative">
             <button id="closeAdminModal" class="absolute top-3 right-3 text-yellow-300 font-bold text-lg">✕</button>
@@ -157,7 +159,7 @@ const adminModalHTML = `
         </div>
     </div>
 `;
-document.body.insertAdjacentHTML('beforeend', adminModalHTML);
+document.body.insertAdjacentHTML('beforeend', adminModalsHTML);
 
 document.addEventListener('click', function(e) {
     if (e.target.closest('.fa-heart') || e.target.closest('h3')?.innerText.includes('Ủng Hộ Tác Giả')) {
@@ -183,15 +185,100 @@ document.getElementById('submitAdminLogin').onclick = function() {
         document.getElementById('userDisplayName').innerText = 'Admin Dunghoet 👑';
         document.getElementById('adminLoginModal').classList.add('hidden');
         showModal("Đăng Nhập Thành Công", "Đã kích hoạt đặc quyền Admin tối cao!", "fa-crown");
+        renderAdminControlBtn();
         loadChatRealtime();
     } else {
         showModal("Sai Thông Tin", "Tên đăng nhập hoặc mật khẩu quản trị không đúng!");
     }
 };
 
+// Thêm nút mở Bảng Quản Trị lên giao diện nếu là Admin
+function renderAdminControlBtn() {
+    if (localStorage.getItem('tet_is_admin') === 'true') {
+        if (!document.getElementById('openAdminDashboardBtn')) {
+            const btnHtml = `
+                <div class="fixed bottom-20 right-4 z-[9998]">
+                    <button id="openAdminDashboardBtn" class="bg-gradient-to-r from-yellow-400 to-amber-600 text-red-950 font-extrabold px-3 py-2 rounded-2xl shadow-2xl border-2 border-white text-xs flex items-center gap-1.5 animate-bounce">
+                        👑 Bảng Quản Trị
+                    </button>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', btnHtml);
+            document.getElementById('openAdminDashboardBtn').onclick = openAdminDashboard;
+        }
+    }
+}
+
+// --- GIAO DIỆN BẢNG QUẢN TRỊ TOÀN QUYỀN (DANH SÁCH USER & BAN NICK) ---
+async function openAdminDashboard() {
+    let existingModal = document.getElementById('adminDashboardModal');
+    if (existingModal) existingModal.remove();
+
+    const dashboardHtml = `
+        <div id="adminDashboardModal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-[99999] p-4">
+            <div class="bg-gradient-to-b from-red-950 to-red-900 border-2 border-yellow-400 rounded-2xl w-full max-w-lg p-5 shadow-2xl flex flex-col max-h-[85vh] relative">
+                <div class="flex justify-between items-center border-b border-yellow-500/30 pb-3 mb-3">
+                    <h3 class="text-yellow-300 font-extrabold text-sm flex items-center gap-1.5">👑 BẢNG QUẢN TRỊ TỐI CAO - DUNGHOET</h3>
+                    <button id="closeAdminDashboard" class="text-yellow-300 font-bold text-lg px-2">✕</button>
+                </div>
+                <div class="text-xs text-yellow-100 mb-2 font-bold">Danh sách toàn bộ tài khoản đăng ký trên hệ thống:</div>
+                <div id="adminUserListContainer" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                    <div class="text-center text-yellow-300/60 py-4 text-xs">Đang tải danh sách tài khoản từ Cloud...</div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', dashboardHtml);
+    document.getElementById('closeAdminDashboard').onclick = () => document.getElementById('adminDashboardModal').remove();
+
+    // Tải dữ liệu user từ Firestore
+    try {
+        const snapshot = await db.collection('tet_users').get();
+        const container = document.getElementById('adminUserListContainer');
+        container.innerHTML = "";
+
+        if (snapshot.empty) {
+            container.innerHTML = `<div class="text-center text-red-300/60 text-xs">Chưa có người dùng nào đăng ký.</div>`;
+            return;
+        }
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const isBanned = data.banned === true;
+            container.innerHTML += `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-red-900/60 border border-yellow-500/30 text-xs">
+                    <div>
+                        <div class="font-extrabold text-yellow-300">${data.name} ${isBanned ? '<span class="text-red-500 font-bold">(ĐÃ BỊ KHÓA)</span>' : ''}</div>
+                        <div class="text-[10px] text-red-200/70">Email: ${data.email} | Mật khẩu: <span class="text-yellow-200 font-bold">${data.pass}</span></div>
+                    </div>
+                    <div>
+                        <button onclick="toggleBanUser('${data.email}', ${!isBanned})" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${isBanned ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow">
+                            ${isBanned ? 'Mở Khóa' : 'Khóa Nick'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (e) {
+        document.getElementById('adminUserListContainer').innerHTML = `<div class="text-center text-red-400 text-xs">Lỗi tải dữ liệu tài khoản từ server.</div>`;
+    }
+}
+
+// Hàm Admin khóa / mở khóa tài khoản
+window.toggleBanUser = async function(email, banStatus) {
+    try {
+        await db.collection('tet_users').doc(email).update({ banned: banStatus });
+        alert(banStatus ? `Đã khóa tài khoản ${email} thành công!` : `Đã mở khóa tài khoản ${email}!`);
+        openAdminDashboard(); // Tải lại bảng quản trị
+    } catch (e) {
+        alert("Không thể thay đổi trạng thái tài khoản.");
+    }
+}
+
 window.onload = function() {
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
+    renderAdminControlBtn();
     loadLeaderboardRealtime();
     loadChatRealtime();
     checkCheckinStatus();
@@ -291,7 +378,7 @@ checkinBtn.onclick = async function() {
     }
 };
 
-// --- PHÒNG CHAT CHUNG REALTIME ---
+// --- PHÒNG CHAT CHUNG REALTIME (AVATAR & TÊN ADMIN SIÊU NỔI BẬT) ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
     const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
@@ -299,11 +386,14 @@ function loadChatRealtime() {
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
         let htmlContent = `
             <div class="flex items-start gap-2">
-                <div class="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-300 font-bold text-[10px] flex-shrink-0">👑</div>
-                <div class="bg-gradient-to-r from-amber-950 to-red-950 border border-yellow-400 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow-lg">
-                    <div class="text-[9px] text-yellow-300 font-extrabold mb-0.5 flex items-center gap-1">Admin Dunghoet 👑 <span class="bg-yellow-500 text-red-950 px-1 rounded text-[7px]">CHÍNH HÃNG</span></div>
-                    <div class="text-yellow-100 text-[11px]">Chào mừng anh em đến với phòng chat Tết 2027! Hệ thống bảo mật thông minh đã kích hoạt! 🎉</div>
-                    <div class="text-[8px] text-yellow-300/60 text-right mt-1">Vừa xong</div>
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-300 border-2 border-white flex items-center justify-center text-red-950 font-black text-xs flex-shrink-0 shadow-lg animate-pulse">👑</div>
+                <div class="bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border-2 border-yellow-400 p-3 rounded-2xl rounded-tl-none max-w-[85%] text-left shadow-2xl">
+                    <div class="text-[10px] text-yellow-300 font-black mb-1 flex items-center gap-1.5 tracking-wider">
+                        <span class="text-sm">👑 ADMIN DUNGHOET</span> 
+                        <span class="bg-yellow-400 text-red-950 px-1.5 py-0.5 rounded text-[8px] font-extrabold shadow">TỐI CAO</span>
+                    </div>
+                    <div class="text-yellow-100 text-xs font-semibold">Chào anh em! Hệ thống quản trị toàn quyền đã kích hoạt. Chúc mọi người năm mới rực rỡ! 🎉</div>
+                    <div class="text-[8px] text-yellow-300/70 text-right mt-1">Vừa xong</div>
                 </div>
             </div>
         `;
@@ -315,24 +405,26 @@ function loadChatRealtime() {
             if ((Date.now() - msg.timestamp) < 300000) {
                 const isOwnerAdmin = msg.sender.includes('Admin');
                 const isSelf = msg.sender === current;
+                
+                // Style cực kỳ nổi bật cho Admin, to hơn và rực rỡ hơn bình thường
                 const avatarChar = isOwnerAdmin ? '👑' : msg.sender.charAt(0).toUpperCase();
-                const avatarBg = isOwnerAdmin ? 'bg-yellow-500/30 border-yellow-400 text-yellow-200' : (isSelf ? 'bg-amber-500/30 border-amber-400 text-yellow-200' : 'bg-red-500/30 border-red-400 text-yellow-300');
-                const bubbleBg = isOwnerAdmin ? 'bg-gradient-to-r from-amber-950 to-red-950 border-yellow-400' : (isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none');
+                const avatarBg = isOwnerAdmin ? 'w-9 h-9 bg-gradient-to-tr from-yellow-500 to-amber-300 border-2 border-white text-red-950 text-xs shadow-lg animate-pulse' : (isSelf ? 'w-7 h-7 bg-amber-500/30 border-amber-400 text-yellow-200 text-[10px]' : 'w-7 h-7 bg-red-500/30 border-red-400 text-yellow-300 text-[10px]');
+                const bubbleBg = isOwnerAdmin ? 'bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border-2 border-yellow-400 shadow-xl' : (isSelf ? 'bg-amber-900/90 border-amber-400/50 rounded-tr-none' : 'bg-red-950/80 border-yellow-500/30 rounded-tl-none');
 
                 let deleteBtnHtml = '';
                 if (isAdmin) {
-                    deleteBtnHtml = `<button onclick="deleteChatMessage('${msgId}')" class="ml-2 text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded hover:bg-red-700">🗑️ Xóa</button>`;
+                    deleteBtnHtml = `<button onclick="deleteChatMessage('${msgId}')" class="ml-2 text-[9px] bg-red-600 text-white px-2 py-0.5 rounded font-bold hover:bg-red-700 shadow">🗑️ Xóa</button>`;
                 }
 
                 htmlContent += `
                     <div class="flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}">
-                        <div class="w-7 h-7 rounded-full ${avatarBg} border flex items-center justify-center font-bold text-[10px] flex-shrink-0">${avatarChar}</div>
-                        <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left shadow relative group">
-                            <div class="text-[9px] ${isOwnerAdmin ? 'text-yellow-300 font-extrabold' : (isSelf ? 'text-amber-300' : 'text-yellow-400')} font-bold mb-0.5 flex justify-between items-center">
+                        <div class="${avatarBg} rounded-full flex items-center justify-center font-bold flex-shrink-0">${avatarChar}</div>
+                        <div class="${bubbleBg} border p-2.5 rounded-2xl max-w-[85%] text-left relative group">
+                            <div class="${isOwnerAdmin ? 'text-[11px] text-yellow-300 font-black tracking-wide' : (isSelf ? 'text-[9px] text-amber-300 font-bold' : 'text-[9px] text-yellow-400 font-bold')} mb-0.5 flex justify-between items-center">
                                 <span>${msg.sender} ${isOwnerAdmin ? '👑' : ''}</span>
                                 ${deleteBtnHtml}
                             </div>
-                            <div class="text-red-100 text-[11px] break-words">${msg.text}</div>
+                            <div class="${isOwnerAdmin ? 'text-yellow-100 text-xs font-semibold' : 'text-red-100 text-[11px]'} break-words">${msg.text}</div>
                             <div class="text-[8px] text-red-300/60 ${isSelf ? 'text-left' : 'text-right'} mt-1">${msg.time}</div>
                         </div>
                     </div>
@@ -354,8 +446,7 @@ window.deleteChatMessage = async function(msgId) {
     }
 }
 
-// --- HỆ THỐNG CHỐNG SPAM THÔNG MINH (SLIDING WINDOW RATE LIMITING) ---
-// Theo dõi lịch sử các lần bấm gửi tin nhắn gần đây của người dùng
+// --- HỆ THỐNG CHỐNG SPAM THÔNG MINH ---
 let chatTimestamps = [];
 
 document.getElementById('chatForm').onsubmit = async function(e) {
@@ -373,24 +464,16 @@ document.getElementById('chatForm').onsubmit = async function(e) {
     const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
     const now = Date.now();
 
-    // Nếu không phải admin thì áp dụng bộ lọc chống spam thông minh
     if (!isAdmin) {
-        // Lọc lại các mốc thời gian gửi trong vòng 5 giây gần nhất
         chatTimestamps = chatTimestamps.filter(t => now - t < 5000);
-        
-        // Nếu trong 5 giây mà bấm gửi từ 3 lần trở lên -> Xác định là hành vi spam/tool phá hoại
         if (chatTimestamps.length >= 3) {
             showModal("Phát Hiện Spam", "Phát hiện hành vi gửi tin nhắn liên tục bất thường! Hệ thống khóa tạm thời yêu cầu đợi 15 giây.", "fa-shield-halved");
             return;
         }
-
-        // Kiểm tra khoảng cách tối thiểu giữa 2 tin nhắn liên tiếp (giãn cách để chống rác chat)
         if (chatTimestamps.length > 0 && now - chatTimestamps[chatTimestamps.length - 1] < 2000) {
             showModal("Thao Tác Quá Nhanh", "Vui lòng từ tốn, mỗi tin nhắn cách nhau ít nhất 2 giây!", "fa-triangle-exclamation");
             return;
         }
-
-        // Ghi nhận mốc thời gian gửi hợp lệ
         chatTimestamps.push(now);
     }
 
