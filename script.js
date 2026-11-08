@@ -1,6 +1,6 @@
+// --- CẤU HÌNH LIÊN KẾT & FIREBASE ---
 const MY_LINK4M_URL = "https://link4m.net/JtoYhsH";
 
-// --- CẤU HÌNH FIREBASE CLOUD DATABASE THẬT CỦA DŨNG ---
 const firebaseConfig = {
     apiKey: "AIzaSyC8oHf9Lhx_r--hsEmUPk9x1Y4u3-TFUEY",
     authDomain: "tet2027-cfd6f.firebaseapp.com",
@@ -46,6 +46,31 @@ function showModal(title, msg, icon = "fa-bell") {
 document.getElementById('modalCloseBtn').onclick = () => {
     document.getElementById('customModal').classList.add('hidden');
 };
+
+// --- HỆ THỐNG POPUP NĂN NỈ CUTE 1 LẦN/NGÀY ---
+function checkAndShowCutePopup() {
+    const lastShownDate = localStorage.getItem('cutePopupShownDate');
+    const today = new Date().toDateString(); // Lấy ngày hiện tại
+
+    // Nếu hôm nay chưa hiện thì cho hiện ngẫu nhiên sau khoảng vài giây (hoặc mô phỏng 3-4 phút tuỳ chỉnh)
+    if (lastShownDate !== today) {
+        setTimeout(() => {
+            const cutePopup = document.getElementById('cutePopup');
+            if (cutePopup) cutePopup.classList.remove('hidden');
+        }, 15000); // Xuất hiện sau 15 giây truy cập web
+    }
+}
+
+document.getElementById('popupAcceptBtn')?.addEventListener('click', () => {
+    // Lưu lại trạng thái hôm nay đã vượt link ủng hộ
+    localStorage.setItem('cutePopupShownDate', new Date().toDateString());
+    document.getElementById('cutePopup').classList.add('hidden');
+    window.open(MY_LINK4M_URL, '_blank');
+});
+
+document.getElementById('popupCloseBtn')?.addEventListener('click', () => {
+    document.getElementById('cutePopup').classList.add('hidden');
+});
 
 // --- KIỂM TRA TỰ ĐỘNG MỖI KHI VÀO TRANG (Đá văng ngay nếu đang bị khóa) ---
 async function checkMyBanStatus() {
@@ -266,8 +291,6 @@ function openEnterpriseAdminDashboard() {
 
     const enterpriseHTML = `
         <div id="enterpriseAdminPage" class="fixed inset-0 bg-[#0f0505] text-white z-[99999] flex flex-col font-sans overflow-hidden">
-            
-            <!-- Top Navbar -->
             <div class="h-12 bg-[#1a0808] border-b border-yellow-500/20 px-3 md:px-6 flex items-center justify-between flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="text-base">👑</span>
@@ -278,10 +301,7 @@ function openEnterpriseAdminDashboard() {
                 </div>
             </div>
 
-            <!-- Body Layout: Sidebar + Content -->
             <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
-                
-                <!-- Sidebar -->
                 <div class="w-full md:w-56 bg-[#140606] border-b md:border-b-0 md:border-r border-yellow-500/20 p-2.5 md:p-4 flex flex-row md:flex-col justify-between flex-shrink-0 gap-2">
                     <div class="flex md:flex-col gap-2 w-full">
                         <button onclick="switchEnterpriseTab('users')" id="entTabUsers" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center md:justify-start gap-1.5 transition">
@@ -294,7 +314,6 @@ function openEnterpriseAdminDashboard() {
                     <div class="hidden md:block text-[10px] text-center text-red-300/40 pb-2">Enterprise v3.1</div>
                 </div>
 
-                <!-- Content Phải -->
                 <div class="flex-1 flex flex-col overflow-hidden bg-[#090202]">
                     <div class="p-3 md:p-5 border-b border-yellow-500/20 bg-[#120505]/40 flex items-center justify-between">
                         <div>
@@ -324,13 +343,11 @@ function openEnterpriseAdminDashboard() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', enterpriseHTML);
     document.getElementById('closeEnterprisePage').onclick = () => document.getElementById('enterpriseAdminPage').remove();
-
     loadEnterpriseUsersTable();
 }
 
@@ -460,7 +477,8 @@ window.unbanEntDevice = async function(deviceId) {
 }
 
 window.onload = function() {
-    checkMyBanStatus(); // Quét trạng thái ban ngay khi load trang
+    checkMyBanStatus(); 
+    checkAndShowCutePopup(); // Kiểm tra bật popup năn nỉ 1 lần/ngày
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
     renderAdminControlBtn();
@@ -564,12 +582,12 @@ checkinBtn.onclick = async function() {
     }
 };
 
-// --- PHÒNG CHAT CHUNG REALTIME (Tự động đá văng nếu bị khóa) ---
+// --- PHÒNG CHAT CHUNG REALTIME ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
     
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(async snapshot => {
-        await checkMyBanStatus(); // Quét liên tục mỗi khi chat có tin nhắn mới về
+        await checkMyBanStatus();
         
         let htmlContent = `
             <div class="flex items-start gap-2">
@@ -632,7 +650,7 @@ window.deleteChatMessage = async function(msgId) {
     }
 }
 
-// --- HỆ THỐNG GỬI TIN NHẮN (Kiểm tra chặn nghiêm ngặt) ---
+// --- HỆ THỐNG GỬI TIN NHẮN ---
 let chatTimestamps = [];
 
 document.getElementById('chatForm').onsubmit = async function(e) {
