@@ -47,6 +47,37 @@ document.getElementById('modalCloseBtn').onclick = () => {
     document.getElementById('customModal').classList.add('hidden');
 };
 
+// --- KIỂM TRA TỰ ĐỘNG MỖI KHI VÀO TRANG (Đá văng ngay nếu đang bị khóa) ---
+async function checkMyBanStatus() {
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
+    if (isAdmin) return;
+
+    const email = localStorage.getItem('tet_current_email');
+    try {
+        const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
+        if (blackDoc.exists && blackDoc.data().banned === true) {
+            localStorage.clear();
+            document.body.innerHTML = `
+                <div style="background: #18181b; color: #fef08a; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: sans-serif;">
+                    <div style="font-size: 50px; margin-bottom: 15px;">🚨</div>
+                    <h1 style="font-size: 18px; font-weight: bold; color: #fca5a5; margin-bottom: 10px;">THIẾT BỊ NÀY ĐÃ BỊ CHẶN VĨNH VIỄN</h1>
+                    <p style="font-size: 13px; color: #fecaca;">Tài khoản hoặc thiết bị của bạn đã bị Admin cấm truy cập hệ thống.</p>
+                </div>
+            `;
+            return;
+        }
+
+        if (email) {
+            const userDoc = await db.collection('tet_users').doc(email).get();
+            if (userDoc.exists && userDoc.data().banned === true) {
+                localStorage.clear();
+                alert("Tài khoản của bạn đã bị Admin khóa vĩnh viễn!");
+                location.reload();
+            }
+        }
+    } catch (e) {}
+}
+
 // --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (USER) ---
 const authModal = document.getElementById('authModal');
 document.getElementById('openAuthModalBtn').onclick = (e) => {
@@ -78,7 +109,7 @@ function isValidEmail(email) {
     return email.includes('@') && email.includes('.') && email.length > 5; 
 }
 
-// Đăng ký (Kiểm tra Blacklist IP trước khi tạo)
+// Đăng ký
 document.getElementById('submitRegister').onclick = async function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -91,7 +122,7 @@ document.getElementById('submitRegister').onclick = async function() {
     try {
         const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
         if (blackDoc.exists && blackDoc.data().banned === true) {
-            showModal("Từ Chối Tạo Tài Khoản", "Thiết bị của bạn đã bị đưa vào danh sách đen (Blacklist IP), không thể đăng ký tài khoản mới!");
+            showModal("Từ Chối Tạo Tài Khoản", "Thiết bị của bạn đã bị đưa vào danh sách đen, không thể đăng ký tài khoản mới!");
             return;
         }
 
@@ -111,7 +142,7 @@ document.getElementById('submitRegister').onclick = async function() {
     }
 };
 
-// Đăng nhập (Kiểm tra khóa nick và Blacklist IP thời gian thực)
+// Đăng nhập
 document.getElementById('submitLogin').onclick = async function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -217,8 +248,8 @@ function renderAdminControlBtn() {
         if (!document.getElementById('openEnterpriseAdminBtn')) {
             const btnHtml = `
                 <div class="fixed bottom-20 right-4 z-[9998]">
-                    <button id="openEnterpriseAdminBtn" class="bg-gradient-to-r from-yellow-400 to-amber-600 text-red-950 font-extrabold px-3.5 py-2.5 rounded-2xl shadow-2xl border-2 border-white text-xs flex items-center gap-2 animate-bounce">
-                        👑 Quản Trị Viên (Enterprise)
+                    <button id="openEnterpriseAdminBtn" class="bg-gradient-to-r from-yellow-400 to-amber-600 text-red-950 font-extrabold px-3 py-2 rounded-2xl shadow-2xl border-2 border-white text-[11px] flex items-center gap-1.5 animate-bounce">
+                        👑 Quản Trị Viên
                     </button>
                 </div>
             `;
@@ -228,7 +259,7 @@ function renderAdminControlBtn() {
     }
 }
 
-// --- TRANG QUẢN TRỊ ENTERPRISE CHUẨN XỊN (FULL MÀN HÌNH NHƯ ẢNH MẪU) ---
+// --- TRANG QUẢN TRỊ ENTERPRISE RESPONSIVE ---
 function openEnterpriseAdminDashboard() {
     let existingPage = document.getElementById('enterpriseAdminPage');
     if (existingPage) existingPage.remove();
@@ -237,62 +268,56 @@ function openEnterpriseAdminDashboard() {
         <div id="enterpriseAdminPage" class="fixed inset-0 bg-[#0f0505] text-white z-[99999] flex flex-col font-sans overflow-hidden">
             
             <!-- Top Navbar -->
-            <div class="h-14 bg-[#1a0808] border-b border-yellow-500/20 px-6 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">👑</span>
-                    <span class="font-extrabold text-sm text-yellow-300 tracking-wider">TET 2027 ENTERPRISE CONTROL PANEL</span>
+            <div class="h-12 bg-[#1a0808] border-b border-yellow-500/20 px-3 md:px-6 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">👑</span>
+                    <span class="font-extrabold text-xs md:text-sm text-yellow-300 tracking-wider">TET 2027 ADMIN PANEL</span>
                 </div>
-                <div class="flex items-center gap-4 text-xs">
-                    <div class="flex items-center gap-2 bg-red-950/60 border border-yellow-500/30 px-3 py-1.5 rounded-xl">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="font-bold text-yellow-200">Admin: Dunghoet Tối Cao</span>
-                    </div>
-                    <button id="closeEnterprisePage" class="bg-red-700 hover:bg-red-800 text-white font-bold px-3 py-1.5 rounded-xl transition shadow">Thoát Quản Trị</button>
+                <div class="flex items-center gap-2 text-xs">
+                    <button id="closeEnterprisePage" class="bg-red-700 hover:bg-red-800 text-white font-bold px-2.5 py-1 rounded-lg transition shadow text-[11px]">Thoát</button>
                 </div>
             </div>
 
             <!-- Body Layout: Sidebar + Content -->
-            <div class="flex-1 flex overflow-hidden">
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
                 
-                <!-- Sidebar Trái -->
-                <div class="w-64 bg-[#140606] border-r border-yellow-500/20 p-4 flex flex-col justify-between flex-shrink-0">
-                    <div class="space-y-1.5">
-                        <div class="text-[10px] text-yellow-500/60 font-bold px-3 pb-1 uppercase tracking-wider">Quản Trị Hệ Thống</div>
-                        <button onclick="switchEnterpriseTab('users')" id="entTabUsers" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center gap-2.5 transition">
-                            👥 Quản Lý Người Dùng
+                <!-- Sidebar -->
+                <div class="w-full md:w-56 bg-[#140606] border-b md:border-b-0 md:border-r border-yellow-500/20 p-2.5 md:p-4 flex flex-row md:flex-col justify-between flex-shrink-0 gap-2">
+                    <div class="flex md:flex-col gap-2 w-full">
+                        <button onclick="switchEnterpriseTab('users')" id="entTabUsers" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center md:justify-start gap-1.5 transition">
+                            👥 <span class="hidden md:inline">Quản Lý</span> Người Dùng
                         </button>
-                        <button onclick="switchEnterpriseTab('blacklist')" id="entTabBlacklist" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center gap-2.5 transition">
-                            🚫 Danh Sách Chặn (Blacklist IP)
+                        <button onclick="switchEnterpriseTab('blacklist')" id="entTabBlacklist" class="flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center justify-center md:justify-start gap-1.5 transition">
+                            🚫 <span class="hidden md:inline">Danh Sách</span> Chặn IP
                         </button>
                     </div>
-                    <div class="text-[10px] text-center text-red-300/40 pb-2">Version 3.0 Enterprise</div>
+                    <div class="hidden md:block text-[10px] text-center text-red-300/40 pb-2">Enterprise v3.1</div>
                 </div>
 
-                <!-- Content Phải (Table Data) -->
+                <!-- Content Phải -->
                 <div class="flex-1 flex flex-col overflow-hidden bg-[#090202]">
-                    <div class="p-6 border-b border-yellow-500/20 bg-[#120505]/40 flex items-center justify-between">
+                    <div class="p-3 md:p-5 border-b border-yellow-500/20 bg-[#120505]/40 flex items-center justify-between">
                         <div>
-                            <h2 id="entHeaderTitle" class="text-base font-extrabold text-yellow-300">Quản Lý Tài Khoản Người Dùng</h2>
-                            <p id="entHeaderDesc" class="text-xs text-red-200/60 mt-0.5">Theo dõi, kiểm soát và cấp quyền hoặc khóa tài khoản vi phạm.</p>
+                            <h2 id="entHeaderTitle" class="text-xs md:text-sm font-extrabold text-yellow-300">Quản Lý Tài Khoản</h2>
                         </div>
-                        <button onclick="refreshEnterpriseContent()" class="bg-yellow-500/20 border border-yellow-400/40 hover:bg-yellow-500/30 text-yellow-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Làm Mới Dữ Liệu</button>
+                        <button onclick="refreshEnterpriseContent()" class="bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🔄 Làm Mới</button>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-6">
-                        <div class="bg-[#140606] border border-yellow-500/20 rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="flex-1 overflow-y-auto p-3 md:p-5">
+                        <div class="bg-[#140606] border border-yellow-500/20 rounded-xl overflow-hidden shadow-2xl">
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left border-collapse text-xs">
+                                <table class="w-full text-left border-collapse text-[11px] md:text-xs">
                                     <thead>
-                                        <tr class="bg-red-950/80 border-b border-yellow-500/20 text-yellow-300">
-                                            <th class="p-3.5 font-extrabold">NGƯỜI DÙNG / TÊN</th>
-                                            <th class="p-3.5 font-extrabold">EMAIL ĐĂNG KÝ</th>
-                                            <th class="p-3.5 font-extrabold">MÃ THIẾT BỊ (DEVICE ID)</th>
-                                            <th class="p-3.5 font-extrabold">TRẠNG THÁI</th>
-                                            <th class="p-3.5 font-extrabold text-right">THAO TÁC QUẢN TRỊ</th>
+                                        <tr class="bg-red-950/80 border-b border-yellow-500/20 text-yellow-300 whitespace-nowrap">
+                                            <th class="p-3 font-extrabold">TÊN NICK</th>
+                                            <th class="p-3 font-extrabold">EMAIL</th>
+                                            <th class="p-3 font-extrabold">THIẾT BỊ</th>
+                                            <th class="p-3 font-extrabold">TRẠNG THÁI</th>
+                                            <th class="p-3 font-extrabold text-right">THAO TÁC</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="entTableBody" class="divide-y divide-yellow-500/10 text-red-100">
-                                        <tr><td colspan="5" class="p-6 text-center text-yellow-300/60">Đang tải dữ liệu từ Cloud Database...</td></tr>
+                                    <tbody id="entTableBody" class="divide-y divide-yellow-500/10 text-red-100 whitespace-nowrap">
+                                        <tr><td colspan="5" class="p-4 text-center text-yellow-300/60">Đang tải dữ liệu...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -316,19 +341,16 @@ window.switchEnterpriseTab = function(tab) {
     const btnUsers = document.getElementById('entTabUsers');
     const btnBlacklist = document.getElementById('entTabBlacklist');
     const title = document.getElementById('entHeaderTitle');
-    const desc = document.getElementById('entHeaderDesc');
 
     if (tab === 'users') {
-        btnUsers.className = "w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center gap-2.5 transition";
-        btnBlacklist.className = "w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center gap-2.5 transition";
+        btnUsers.className = "flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center md:justify-start gap-1.5 transition";
+        btnBlacklist.className = "flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center justify-center md:justify-start gap-1.5 transition";
         title.innerText = "Quản Lý Tài Khoản Người Dùng";
-        desc.innerText = "Theo dõi, kiểm soát và cấp quyền hoặc khóa tài khoản vi phạm.";
         loadEnterpriseUsersTable();
     } else {
-        btnBlacklist.className = "w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center gap-2.5 transition";
-        btnUsers.className = "w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center gap-2.5 transition";
+        btnBlacklist.className = "flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-yellow-300 bg-yellow-500/20 border border-yellow-400/40 flex items-center justify-center md:justify-start gap-1.5 transition";
+        btnUsers.className = "flex-1 md:w-full text-center md:text-left px-3 py-2 rounded-xl text-[11px] md:text-xs font-bold text-red-200 hover:bg-yellow-500/10 flex items-center justify-center md:justify-start gap-1.5 transition";
         title.innerText = "Danh Sách Thiết Bị Bị Chặn (Blacklist IP)";
-        desc.innerText = "Quản lý các thiết bị/IP bị hệ thống cấm truy cập.";
         loadEnterpriseBlacklistTable();
     }
 }
@@ -338,15 +360,14 @@ window.refreshEnterpriseContent = function() {
     else loadEnterpriseBlacklistTable();
 }
 
-// Bảng Users
 async function loadEnterpriseUsersTable() {
     const tbody = document.getElementById('entTableBody');
-    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-yellow-300/60">Đang tải danh sách người dùng...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-yellow-300/60">Đang tải danh sách...</td></tr>`;
     try {
         const snapshot = await db.collection('tet_users').get();
         tbody.innerHTML = "";
         if (snapshot.empty) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-300/60">Chưa có người dùng nào đăng ký.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-300/60">Chưa có người dùng nào.</td></tr>`;
             return;
         }
         snapshot.forEach(doc => {
@@ -354,31 +375,30 @@ async function loadEnterpriseUsersTable() {
             const isBanned = data.banned === true;
             tbody.innerHTML += `
                 <tr class="hover:bg-red-950/40 transition">
-                    <td class="p-3.5 font-bold text-yellow-200">${data.name}</td>
-                    <td class="p-3.5 text-red-200/80">${data.email}</td>
-                    <td class="p-3.5 font-mono text-[11px] text-yellow-100/60">${data.deviceId || 'N/A'}</td>
-                    <td class="p-3.5">
-                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${isBanned ? 'bg-red-600/30 text-red-400 border border-red-500/40' : 'bg-green-600/30 text-green-400 border border-green-500/40'}">
-                            ${isBanned ? 'ĐÃ KHÓA' : 'ĐANG HOẠT ĐỘNG'}
+                    <td class="p-3 font-bold text-yellow-200">${data.name}</td>
+                    <td class="p-3 text-red-200/80">${data.email}</td>
+                    <td class="p-3 font-mono text-[10px] text-yellow-100/60">${data.deviceId || 'N/A'}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ${isBanned ? 'bg-red-600/30 text-red-400 border border-red-500/40' : 'bg-green-600/30 text-green-400 border border-green-500/40'}">
+                            ${isBanned ? 'ĐÃ KHÓA' : 'HOẠT ĐỘNG'}
                         </span>
                     </td>
-                    <td class="p-3.5 text-right">
-                        <button onclick="toggleEntBanUser('${data.email}', '${data.deviceId || ''}', ${!isBanned})" class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold ${isBanned ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'} shadow transition">
-                            ${isBanned ? 'Mở Khóa' : 'Khóa Nick & IP'}
+                    <td class="p-3 text-right">
+                        <button onclick="toggleEntBanUser('${data.email}', '${data.deviceId || ''}', ${!isBanned})" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${isBanned ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'} shadow transition">
+                            ${isBanned ? 'Mở Khóa' : 'Khóa Nick'}
                         </button>
                     </td>
                 </tr>
             `;
         });
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-400">Lỗi tải dữ liệu từ Cloud.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400">Lỗi tải dữ liệu.</td></tr>`;
     }
 }
 
-// Bảng Blacklist IP
 async function loadEnterpriseBlacklistTable() {
     const tbody = document.getElementById('entTableBody');
-    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-yellow-300/60">Đang tải danh sách thiết bị chặn...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-yellow-300/60">Đang tải danh sách chặn...</td></tr>`;
     try {
         const snapshot = await db.collection('tet_blacklist').get();
         tbody.innerHTML = "";
@@ -389,15 +409,15 @@ async function loadEnterpriseBlacklistTable() {
                 count++;
                 tbody.innerHTML += `
                     <tr class="hover:bg-red-950/40 transition">
-                        <td class="p-3.5 font-mono font-bold text-red-400">${doc.id}</td>
-                        <td class="p-3.5 text-red-200/80">${data.email || 'Không rõ'}</td>
-                        <td class="p-3.5 text-yellow-100/60">Thiết bị bị cấm vĩnh viễn</td>
-                        <td class="p-3.5">
-                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-red-600/30 text-red-400 border border-red-500/40">BỊ CHẶN IP</span>
+                        <td class="p-3 font-mono font-bold text-red-400">${doc.id}</td>
+                        <td class="p-3 text-red-200/80">${data.email || 'Không rõ'}</td>
+                        <td class="p-3 text-yellow-100/60">Cấm vĩnh viễn</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[9px] font-extrabold bg-red-600/30 text-red-400 border border-red-500/40">BỊ CHẶN</span>
                         </td>
-                        <td class="p-3.5 text-right">
-                            <button onclick="unbanEntDevice('${doc.id}')" class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold bg-green-600 hover:bg-green-700 text-white shadow transition">
-                                Gỡ Chặn IP
+                        <td class="p-3 text-right">
+                            <button onclick="unbanEntDevice('${doc.id}')" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-green-600 hover:bg-green-700 text-white shadow transition">
+                                Gỡ Chặn
                             </button>
                         </td>
                     </tr>
@@ -405,41 +425,42 @@ async function loadEnterpriseBlacklistTable() {
             }
         });
         if (count === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-yellow-300/60">Chưa có thiết bị nào bị đưa vào danh sách đen.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-yellow-300/60">Chưa có thiết bị nào bị chặn.</td></tr>`;
         }
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-red-400">Lỗi tải danh sách chặn.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-400">Lỗi tải danh sách chặn.</td></tr>`;
     }
 }
 
 window.toggleEntBanUser = async function(email, deviceId, banStatus) {
     try {
-        await db.collection('tet_users').doc(email).update({ banned: banStatus });
+        await db.collection('tet_users').doc(email).set({ banned: banStatus }, { merge: true });
         if (deviceId) {
-            await db.collection('tet_blacklist').doc(deviceId).set({ banned: banStatus, email: email, updatedAt: Date.now() });
+            await db.collection('tet_blacklist').doc(deviceId).set({ banned: banStatus, email: email, updatedAt: Date.now() }, { merge: true });
         }
-        alert(banStatus ? `Đã khóa tài khoản ${email} và vô hiệu hóa thiết bị thành công!` : `Đã mở khóa tài khoản thành công!`);
+        alert(banStatus ? `Đã khóa vĩnh viễn tài khoản ${email} thành công!` : `Đã mở khóa tài khoản thành công!`);
         refreshEnterpriseContent();
     } catch (e) {
-        alert("Không thể thay đổi trạng thái.");
+        alert("Lỗi khi thay đổi trạng thái khóa.");
     }
 }
 
 window.unbanEntDevice = async function(deviceId) {
     try {
-        await db.collection('tet_blacklist').doc(deviceId).update({ banned: false });
+        await db.collection('tet_blacklist').doc(deviceId).set({ banned: false }, { merge: true });
         const q = await db.collection('tet_users').where('deviceId', '==', deviceId).get();
         if (!q.empty) {
-            await q.docs[0].ref.update({ banned: false });
+            await q.docs[0].ref.set({ banned: false }, { merge: true });
         }
         alert("Đã gỡ chặn thiết bị thành công!");
         refreshEnterpriseContent();
     } catch (e) {
-        alert("Không thể gỡ chặn thiết bị.");
+        alert("Lỗi khi gỡ chặn.");
     }
 }
 
 window.onload = function() {
+    checkMyBanStatus(); // Quét trạng thái ban ngay khi load trang
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
     renderAdminControlBtn();
@@ -503,35 +524,12 @@ function checkCheckinStatus() {
     }
 }
 
-// Điểm danh (Kiểm tra chống ban realtime)
 checkinBtn.onclick = async function() {
+    await checkMyBanStatus();
     const username = localStorage.getItem('tet_current_user');
-    const email = localStorage.getItem('tet_current_email');
     if (!username) {
         showModal("Yêu Cầu Đăng Nhập", "Vui lòng đăng nhập tài khoản trước khi điểm danh!", "fa-user-lock");
         return;
-    }
-
-    const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
-    if (!isAdmin) {
-        try {
-            const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
-            if (blackDoc.exists && blackDoc.data().banned === true) {
-                localStorage.clear();
-                showModal("Thiết Bị Bị Khóa", "Thiết bị của bạn đã bị đưa vào danh sách đen!", "fa-user-lock");
-                setTimeout(() => location.reload(), 2000);
-                return;
-            }
-
-            let userDoc = null;
-            if (email) userDoc = await db.collection('tet_users').doc(email).get();
-            if (userDoc && userDoc.exists && userDoc.data().banned === true) {
-                localStorage.clear();
-                showModal("Tài Khoản Bị Khóa", "Tài khoản của bạn đã bị khóa vĩnh viễn!", "fa-user-lock");
-                setTimeout(() => location.reload(), 2000);
-                return;
-            }
-        } catch(e) {}
     }
 
     const today = new Date().toDateString();
@@ -566,11 +564,13 @@ checkinBtn.onclick = async function() {
     }
 };
 
-// --- PHÒNG CHAT CHUNG REALTIME ---
+// --- PHÒNG CHAT CHUNG REALTIME (Tự động đá văng nếu bị khóa) ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
     
-    db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
+    db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(async snapshot => {
+        await checkMyBanStatus(); // Quét liên tục mỗi khi chat có tin nhắn mới về
+        
         let htmlContent = `
             <div class="flex items-start gap-2">
                 <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-300 border-2 border-white flex items-center justify-center text-red-950 font-black text-xs flex-shrink-0 shadow-lg animate-pulse">👑</div>
@@ -632,7 +632,7 @@ window.deleteChatMessage = async function(msgId) {
     }
 }
 
-// --- HỆ THỐNG GỬI TIN NHẮN (Kiểm tra realtime chống ban & rate limit) ---
+// --- HỆ THỐNG GỬI TIN NHẮN (Kiểm tra chặn nghiêm ngặt) ---
 let chatTimestamps = [];
 
 document.getElementById('chatForm').onsubmit = async function(e) {
@@ -641,6 +641,7 @@ document.getElementById('chatForm').onsubmit = async function(e) {
     const text = input.value.trim();
     if (!text) return;
 
+    await checkMyBanStatus();
     const username = localStorage.getItem('tet_current_user');
     const email = localStorage.getItem('tet_current_email');
     if (!username) {
@@ -650,7 +651,6 @@ document.getElementById('chatForm').onsubmit = async function(e) {
 
     const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
 
-    // Kiểm tra trạng thái bị ban thiết bị hoặc tài khoản trên Cloud trước khi cho chat
     if (!isAdmin) {
         try {
             const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
@@ -661,23 +661,14 @@ document.getElementById('chatForm').onsubmit = async function(e) {
                 return;
             }
 
-            let userDoc = null;
             if (email) {
-                userDoc = await db.collection('tet_users').doc(email).get();
-            }
-            if (!userDoc || !userDoc.exists) {
-                const q = await db.collection('tet_users').where('name', '==', username).get();
-                if (!q.empty) {
-                    userDoc = q.docs[0];
+                const userDoc = await db.collection('tet_users').doc(email).get();
+                if (userDoc.exists && userDoc.data().banned === true) {
+                    localStorage.clear();
+                    showModal("Tài Khoản Bị Khóa", "Tài khoản này đã bị khóa vĩnh viễn!", "fa-user-lock");
+                    setTimeout(() => location.reload(), 2000);
+                    return;
                 }
-            }
-
-            if (userDoc && userDoc.exists && userDoc.data().banned === true) {
-                localStorage.removeItem('tet_current_user');
-                localStorage.removeItem('tet_current_email');
-                showModal("Tài Khoản Bị Khóa", "Tài khoản của bạn đã bị Admin cấm vĩnh viễn khỏi hệ thống!", "fa-user-lock");
-                setTimeout(() => location.reload(), 2000);
-                return;
             }
         } catch (err) {}
     }
