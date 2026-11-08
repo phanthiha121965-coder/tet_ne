@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào Xuân Đinh Mùi 2027 - Mừng Tết Nguyên Đán</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tetRed: '#B91C1C',
+                        tetDarkRed: '#580A0A',
+                        tetGold: '#FBBF24',
+                        tetLightGold: '#FDE68A',
+                        tetAmber: '#D97706',
+                    },
+                    fontFamily: {
+                        cursive: ['Dancing Script', 'cursive'],
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2b0404; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+        
+        body {
+            background: radial-gradient(circle at center, #7f1d1d 0%, #360707 60%, #170202 100%);
+            color: #fff;
+            overflow-x: hidden;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(88, 10, 10, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(251, 191, 36, 0.15);
+        }
+
+        .gold-text-glow {
+            color: #fde68a;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6), 0 0 20px rgba(217, 119, 6, 0.4);
+        }
+
+        .red-text-glow {
+            text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+        .animate-pulse-glow { animation: pulseGlow 3s infinite ease-in-out; }
+
+        #fireworksCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-yellow-500 selection:text-red-950">
+
+    <!-- Canvas pháo hoa -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- 1. GIAO DIỆN TRANG CHỦ TẾT -->
+    <div id="homeSection" class="w-full flex flex-col min-h-screen justify-between relative z-20">
+
+        <!-- POPUP NĂN NỈ CUTE (Dẫn tới link Link4M của cậu) -->
+        <div id="cutePopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+            <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
+                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
+                    <i class="fa-solid fa-face-pleading text-yellow-300 animate-bounce"></i>
+                </div>
+                <h3 class="font-serif text-xl font-bold text-yellow-300 mb-2">Gửi Các Anh Đẹp Trai!</h3>
+                <p class="text-xs text-red-200 mb-5 leading-relaxed">
+                    Các anh đẹp trai có thể bấm ủng hộ em <span class="text-yellow-300 font-bold">1 lần thui</span> được không ạ? Đi mà, giúp em đi mà... 🥺🙏
+                </p>
+                <div class="space-y-2">
+                    <button id="popupAcceptBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200">
+                        <i class="fa-solid fa-heart mr-1"></i> Bấm Ủng Hộ Ngay (Link4M)
+                    </button>
+                    <button id="popupCloseBtn" class="w-full py-2.5 bg-red-950/80 text-red-300 hover:text-white font-semibold rounded-xl text-xs border border-red-500/30 transition">
+                        Thôi để sau (Đóng)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút điều khiển âm thanh & Đăng nhập góc phải -->
+        <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
+            <div id="authStatusContainer" class="relative">
+                <button id="openAuthModalBtn" class="glass-card hover:bg-yellow-500/20 text-yellow-300 px-3 sm:px-4 h-12 rounded-full flex items-center gap-2 transition border border-yellow-500/50 shadow-lg text-xs sm:text-sm font-semibold active:scale-95">
+                    <i class="fa-solid fa-user-circle text-lg"></i>
+                    <span id="userDisplayName">Đăng Nhập</span>
+                </button>
+                
+                <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-2 border border-yellow-500/50 shadow-2xl hidden">
+                    <button id="logoutBtn" class="w-full text-left px-3 py-2 rounded-xl text-red-200 hover:bg-red-800/60 hover:text-yellow-300 text-xs font-bold transition flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất (Thoát)
+                    </button>
+                </div>
+            </div>
+
+            <button id="fireworksToggleBtn" title="Bắn pháo hoa ngay" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95">
+                <i class="fa-solid fa-burst text-xl animate-bounce"></i>
+            </button>
+            
+            <button id="musicToggleBtn" title="Bật/Tắt Nhạc Tết" class="glass-card hover:bg-yellow-500/20 text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center transition border border-yellow-500/50 shadow-lg active:scale-95">
+                <i id="musicIcon" class="fa-solid fa-music text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Nhạc Tết 2027 Remix Youtube Player (Loop liên tục) -->
+        <iframe id="ytMusicPlayer" style="display:none;" width="0" height="0" 
+            src="https://www.youtube.com/embed/V0mpjcAjL4o?enablejsapi=1&autoplay=1&loop=1&playlist=V0mpjcAjL4o" 
+            allow="autoplay">
+        </iframe>
+
+        <!-- Header & Hero Section -->
+        <header class="pt-16 pb-4 text-center px-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card border border-yellow-500/40 text-yellow-300 text-xs sm:text-sm uppercase tracking-widest font-semibold mb-4">
+                <i class="fa-solid fa-sparkles text-yellow-400"></i>
+                <span>Mừng Xuân Mới Đinh Mùi 2027</span>
+                <i class="fa-solid fa-sparkles text-yellow-400"></i>
+            </div>
+
+            <h1 class="font-cursive text-5xl sm:text-7xl md:text-8xl text-yellow-400 gold-text-glow font-bold mb-2 tracking-wide">
+                Chúc Mừng Năm Mới
+            </h1>
+            <p class="font-serif italic text-lg sm:text-2xl text-red-200 opacity-90 max-w-2xl mx-auto">
+                "Xuân an khang đức tài như ý – Niên thịnh vượng phúc thọ vô biên"
+            </p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="container mx-auto px-4 py-4 flex-grow flex flex-col items-center justify-center gap-10">
+
+            <!-- Countdown Timer Card -->
+            <section class="w-full max-w-4xl glass-card rounded-3xl p-6 sm:p-10 border-2 border-yellow-500/50 text-center animate-pulse-glow">
+                <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-widest text-yellow-400 mb-6 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hourglass-start"></i> Đếm ngược tới Giao Thừa 2027 (Mùng 1 Tết Đinh Mùi)
+                </h2>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="bg-red-950/70 border border-yellow-500/40 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center shadow-inner">
+                        <span id="days" class="font-bold text-4xl sm:text-6xl text-yellow-300 gold-text-glow font-mono">00</span>
+                        <span class="text-xs sm:text-sm text-red-200 font-medium uppercase mt-2">Ngày</span>
+                    </div>
+                    <div class="bg-red-950/70 border border-yellow-500/40 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center shadow-inner">
+                        <span id="hours" class="font-bold text-4xl sm:text-6xl text-yellow-300 gold-text-glow font-mono">00</span>
+                        <span class="text-xs sm:text-sm text-red-200 font-medium uppercase mt-2">Giờ</span>
+                    </div>
+                    <div class="bg-red-950/70 border border-yellow-500/40 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center shadow-inner">
+                        <span id="minutes" class="font-bold text-4xl sm:text-6xl text-yellow-300 gold-text-glow font-mono">00</span>
+                        <span class="text-xs sm:text-sm text-red-200 font-medium uppercase mt-2">Phút</span>
+                    </div>
+                    <div class="bg-red-950/70 border border-yellow-500/40 rounded-2xl p-4 sm:p-6 flex flex-col items-center justify-center shadow-inner">
+                        <span id="seconds" class="font-bold text-4xl sm:text-6xl text-yellow-400 red-text-glow font-mono">00</span>
+                        <span class="text-xs sm:text-sm text-red-200 font-medium uppercase mt-2">Giây</span>
+                    </div>
+                </div>
+
+                <p class="text-xs sm:text-sm text-yellow-200/80 italic mt-6">
+                    <i class="fa-solid fa-calendar-star text-yellow-400 mr-1"></i> Thời điểm Giao Thừa: 00:00:00 - Ngày 6 tháng 2 năm 2027 (Dương Lịch)
+                </p>
+            </section>
+
+            <!-- Interactive Features Section -->
+            <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- 1. Điểm Danh Hàng Ngày -->
+                <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col items-center justify-between text-center relative">
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Điểm Danh</h3>
+                        <p class="text-xs text-red-200 mb-3">Nhận lì xì mỗi ngày.</p>
+                    </div>
+                    <div id="checkinStatusBox" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
+                        Chưa điểm danh...
+                    </div>
+                    <button id="checkinBtn" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        Điểm Danh Ngay
+                    </button>
+                </section>
+
+                <!-- 2. Rút Quẻ May Mắn -->
+                <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col items-center justify-between text-center relative">
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
+                            <i class="fa-solid fa-box-archive"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Rút Quẻ</h3>
+                        <p class="text-xs text-red-200 mb-3">Thỉnh quẻ đầu năm.</p>
+                    </div>
+                    <div id="queResultBox" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
+                        Thỉnh quẻ đầu năm...
+                    </div>
+                    <button id="rutQueBtn" class="w-full py-2.5 px-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        Rút Quẻ Ngay
+                    </button>
+                </section>
+
+                <!-- 3. Ủng Hộ Link4M -->
+                <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col items-center justify-between text-center relative">
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
+                            <i class="fa-solid fa-heart text-red-400 animate-pulse"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Ủng Hộ Tác Giả</h3>
+                        <p class="text-xs text-red-200 mb-3">Bấm qua link ủng hộ ad một chút lì xì nha!</p>
+                    </div>
+                    <div class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] italic min-h-[40px] flex items-center justify-center w-full">
+                        Cảm ơn các anh đẹp trai ủng hộ! ❤️
+                    </div>
+                    <button id="supportBtn" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-red-950 font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Bấm Ủng Hộ Ngay
+                    </button>
+                </section>
+
+                <!-- 4. Tạo Thiệp Chúc Tết -->
+                <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col items-center justify-between text-center relative">
+                    <div>
+                        <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+                        <h3 class="font-serif text-lg font-bold text-yellow-300 mb-1">Thiệp Tết</h3>
+                        <p class="text-xs text-red-200 mb-2">Tạo thiệp chúc mừng.</p>
+                    </div>
+                    <div class="w-full space-y-2 my-1">
+                        <input type="text" id="senderNameInput" placeholder="Tên của bạn..." class="w-full px-2.5 py-1.5 rounded-lg bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-[11px] focus:outline-none">
+                    </div>
+                    <button id="createCardBtn" class="w-full py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-yellow-300 font-bold uppercase text-[11px] shadow-lg transition mt-2">
+                        Tạo Thiệp Ngay
+                    </button>
+                </section>
+
+            </div>
+
+            <!-- Nút giả lập xem trang cảm ơn (Dùng để test khi vượt link xong) -->
+            <button id="testThankyouBtn" class="text-xs text-yellow-300/80 underline hover:text-yellow-300 transition mt-2">
+                ✨ (Bấm vào đây để xem thử Giao Diện Cảm Ơn khi vượt link xong)
+            </button>
+        </main>
+    </div>
+
+    <!-- 2. GIAO DIỆN TRANG CẢM ƠN (Tích hợp ẩn sẵn, khi cần sẽ hiện lên) -->
+    <div id="thankyouSection" class="fixed inset-0 z-40 bg-radial from-red-900 to-black flex items-center justify-center px-4 hidden">
+        <div class="glass-card max-w-md w-full rounded-3xl p-8 text-center relative z-10 border-2 border-yellow-400 shadow-2xl">
+            <div class="w-20 h-20 mx-auto mb-4 bg-yellow-500/20 rounded-full flex items-center justify-center border-2 border-yellow-400 text-yellow-300 text-3xl shadow-lg animate-bounce">
+                <i class="fa-solid fa-heart text-red-500 animate-pulse"></i>
+            </div>
+
+            <h1 class="font-cursive text-4xl sm:text-5xl text-yellow-400 gold-text-glow font-bold mb-3">
+                Cảm Ơn Các Anh!
+            </h1>
+            
+            <p class="text-sm text-red-100 mb-6 leading-relaxed">
+                Tuyệt vời quá! Cảm ơn các anh đẹp trai đã vượt link ủng hộ em nha! Chúc các anh và gia đình năm mới <span class="text-yellow-300 font-bold">Đinh Mùi 2027</span> an khang thịnh vượng, vạn sự như ý! 🧧✨
+            </p>
+
+            <button id="backToHomeBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-yellow-500 text-red-950 font-bold uppercase tracking-wider text-xs shadow-xl transition transform active:scale-95 border border-yellow-200">
+                <i class="fa-solid fa-house mr-2"></i> Quay Lại Trang Chủ Web Tết
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 relative shadow-2xl">
+            <button id="closeAuthModal" class="absolute top-3 right-3 text-yellow-400 hover:text-white w-7 h-7 rounded-full flex items-center justify-center border border-yellow-500/30 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex rounded-xl bg-red-950/90 p-1 border border-yellow-500/40 mb-5">
+                <button id="tabLogin" class="flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition">Đăng Nhập</button>
+                <button id="tabRegister" class="flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition">Đăng Ký</button>
+            </div>
+
+            <div id="formLogin" class="space-y-3">
+                <h3 class="font-serif text-xl font-bold text-yellow-300 text-center mb-1">Đăng Nhập Tài Khoản</h3>
+                <input type="email" id="loginEmail" placeholder="Email (vd: abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
+                <input type="password" id="loginPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
+                <button id="submitLogin" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-200 mt-2">
+                    Đăng Nhập
+                </button>
+            </div>
+
+            <div id="formRegister" class="space-y-3 hidden">
+                <h3 class="font-serif text-xl font-bold text-yellow-300 text-center mb-1">Tạo Tài Khoản Mới</h3>
+                <input type="text" id="regName" placeholder="Tên hiển thị..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
+                <input type="email" id="regEmail" placeholder="Email hợp lệ (vd: abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
+                <input type="password" id="regPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 focus:outline-none text-sm">
+                <button id="submitRegister" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-800 text-yellow-300 font-bold rounded-xl text-sm uppercase shadow-lg border border-yellow-400/50 mt-2">
+                    Đăng Ký Ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Xử Lý Ứng Dụng -->
+    <script>
+        // 👉 Đặt link Link4M thực tế của cậu vào đây:
+        const MY_LINK4M_URL = "https://link4m.co/DANH_SACH_LINK_CUA_CAU";
+
+        const targetDate = new Date('February 6, 2027 00:00:00').getTime();
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+            if (diff > 0) {
+                document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000);
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Xử lý chuyển đổi qua lại trang cảm ơn (Dùng để test hoặc khi có tham số trên URL)
+        const homeSection = document.getElementById('homeSection');
+        const thankyouSection = document.getElementById('thankyouSection');
+        const testThankyouBtn = document.getElementById('testThankyouBtn');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+
+        testThankyouBtn.addEventListener('click', () => {
+            homeSection.classList.add('hidden');
+            thankyouSection.classList.remove('hidden');
+        });
+
+        backToHomeBtn.addEventListener('click', () => {
+            thankyouSection.classList.add('hidden');
+            homeSection.classList.remove('hidden');
+        });
+
+        // Nếu người dùng mở web và có thanh địa chỉ dạng ?thankyou=1 thì tự động hiện trang cảm ơn
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('thankyou')) {
+                homeSection.classList.add('hidden');
+                thankyouSection.classList.remove('hidden');
+            }
+        });
+
+        // Popup Năn Nỉ Cute
+        const cutePopup = document.getElementById('cutePopup');
+        const popupCloseBtn = document.getElementById('popupCloseBtn');
+        const popupAcceptBtn = document.getElementById('popupAcceptBtn');
+
+        function showCutePopup() {
+            cutePopup.classList.remove('hidden');
+        }
+        setTimeout(showCutePopup, 1500);
+
+        function scheduleNextPopup() {
+            const randomDelay = Math.floor(Math.random() * (300000 - 60000 + 1)) + 60000;
+            setTimeout(showCutePopup, randomDelay);
+        }
+
+        popupCloseBtn.addEventListener('click', () => {
+            cutePopup.classList.add('hidden');
+            scheduleNextPopup();
+        });
+
+        popupAcceptBtn.addEventListener('click', () => {
+            cutePopup.classList.add('hidden');
+            window.open(MY_LINK4M_URL, '_blank');
+            scheduleNextPopup();
+        });
+
+        document.getElementById('supportBtn').addEventListener('click', () => {
+            window.open(MY_LINK4M_URL, '_blank');
+        });
+
+        let isMusicPlaying = true;
+        const musicBtn = document.getElementById('musicToggleBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        
+        musicBtn.addEventListener('click', () => {
+            isMusicPlaying = !isMusicPlaying;
+            const iframe = document.getElementById('ytMusicPlayer');
+            if (isMusicPlaying) {
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                musicIcon.className = "fa-solid fa-music text-lg";
+                musicBtn.classList.remove('opacity-50');
+            } else {
+                iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                musicIcon.className = "fa-solid fa-volume-xmark text-lg";
+                musicBtn.classList.add('opacity-50');
+            }
+        });
+
+        // Điểm danh hàng ngày
+        const checkinBtn = document.getElementById('checkinBtn');
+        const checkinStatusBox = document.getElementById('checkinStatusBox');
+
+        function checkCheckinStatus() {
+            const lastCheckin = localStorage.getItem('tet_last_checkin');
+            const today = new Date().toDateString();
+            if (lastCheckin === today) {
+                checkinStatusBox.innerText = "✅ Hôm nay đã điểm danh!";
+                checkinBtn.innerText = "Đã Điểm Danh";
+                checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        checkCheckinStatus();
+
+        checkinBtn.addEventListener('click', () => {
+            const username = localStorage.getItem('tet_username');
+            if (!username) {
+                alert('Vui lòng Đăng nhập tài khoản trước!');
+                document.getElementById('authModal').classList.remove('hidden');
+                return;
+            }
+            const lastCheckin = localStorage.getItem('tet_last_checkin');
+            const today = new Date().toDateString();
+            if (lastCheckin === today) {
+                alert('Hôm nay bạn đã điểm danh rồi!');
+                return;
+            }
+            localStorage.setItem('tet_last_checkin', today);
+            checkinStatusBox.innerText = `🎉 Điểm danh thành công!`;
+            checkinBtn.innerText = "Đã Điểm Danh";
+            checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            triggerFireworkBurst();
+        });
+
+        const queList = [
+            "Quẻ Đại Cát: Công thành danh toạ, tài lộc dồi dào, vạn sự hanh thông suốt cả năm Đinh Mùi!",
+            "Quẻ Phát Tài: Tiền vô như nước, kinh doanh hồng phát, gia đạo bình an thịnh vượng.",
+            "Quẻ Bình An: Sức khỏe dồi dào, tai qua nạn khỏi, gia đình hạnh phúc viên mãn.",
+            "Quẻ Tấn Thới: Học hành tiến tới, công danh thăng tiến, gặp dữ hóa lành.",
+            "Quẻ Như Ý: Cầu được ước thấy, mọi mưu sự đều đạt kết quả tốt đẹp ngoài mong đợi."
+        ];
+        document.getElementById('rutQueBtn').addEventListener('click', () => {
+            const randomQue = queList[Math.floor(Math.random() * queList.length)];
+            document.getElementById('queResultBox').innerText = randomQue;
+            triggerFireworkBurst();
+        });
+
+        document.getElementById('createCardBtn').addEventListener('click', () => {
+            const name = document.getElementById('senderNameInput').value.trim() || "Bạn bè gần xa";
+            alert(`🎉 Đã tạo thiệp chúc Tết thành công cho "${name}"!\n\n"Chúc mừng năm mới Đinh Mùi 2027 - An Khang Thịnh Vượng, Vạn Sự Như Ý!"`);
+            triggerFireworkBurst();
+        });
+
+        const authModal = document.getElementById('authModal');
+        const openAuthBtn = document.getElementById('openAuthModalBtn');
+        const userDropdownMenu = document.getElementById('userDropdownMenu');
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const formLogin = document.getElementById('formLogin');
+        const formRegister = document.getElementById('formRegister');
+
+        openAuthBtn.addEventListener('click', () => {
+            const saved = localStorage.getItem('tet_username');
+            if (saved) {
+                userDropdownMenu.classList.toggle('hidden');
+            } else {
+                authModal.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('closeAuthModal').addEventListener('click', () => authModal.classList.add('hidden'));
+
+        tabLogin.addEventListener('click', () => {
+            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition";
+            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition";
+            formLogin.classList.remove('hidden');
+            formRegister.classList.add('hidden');
+        });
+
+        tabRegister.addEventListener('click', () => {
+            tabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition";
+            tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-red-200 hover:text-yellow-300 transition";
+            formRegister.classList.remove('hidden');
+            formLogin.classList.add('hidden');
+        });
+
+        function isValidEmail(email) {
+            return email.endsWith('@gmail.com') && email.length > 10;
+        }
+
+        document.getElementById('submitLogin').addEventListener('click', () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            if (!isValidEmail(email)) {
+                alert('Email không hợp lệ! Vui lòng dùng định dạng @gmail.com');
+                return;
+            }
+            if (pass.length < 6) {
+                alert('Mật khẩu ít nhất 6 ký tự!');
+                return;
+            }
+
+            const username = email.split('@')[0];
+            localStorage.setItem('tet_username', username);
+            document.getElementById('userDisplayName').innerText = username;
+            authModal.classList.add('hidden');
+            alert(`Đăng nhập thành công, chào mừng ${username}!`);
+        });
+
+        document.getElementById('submitRegister').addEventListener('click', () => {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+
+            if (!name) {
+                alert('Vui lòng nhập tên hiển thị!');
+                return;
+            }
+            if (!isValidEmail(email)) {
+                alert('Email không hợp lệ! Phải có đuôi @gmail.com');
+                return;
+            }
+            if (pass.length < 6) {
+                alert('Mật khẩu đăng ký ít nhất 6 ký tự!');
+                return;
+            }
+
+            localStorage.setItem('tet_username', name);
+            document.getElementById('userDisplayName').innerText = name;
+            authModal.classList.add('hidden');
+            alert(`Đăng ký tài khoản thành công! Chào mừng ${name}.`);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('tet_username');
+            document.getElementById('userDisplayName').innerText = 'Đăng Nhập';
+            userDropdownMenu.classList.add('hidden');
+            alert('Đã đăng xuất tài khoản thành công!');
+        });
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('tet_username');
+            if(saved) document.getElementById('userDisplayName').innerText = saved;
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!document.getElementById('authStatusContainer').contains(e.target)) {
+                userDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 6 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.010;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.08;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        let particles = [];
+        function createFirework(x, y) {
+            const colors = ['#FBBF24', '#EF4444', '#10B981', '#3B82F6', '#EC4899', '#FDE68A'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function triggerFireworkBurst() {
+            createFirework(Math.random() * canvas.width * 0.8 + canvas.width * 0.1, Math.random() * canvas.height * 0.5);
+        }
+
+        window.addEventListener('click', (e) => {
+            if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+                createFirework(e.clientX, e.clientY);
+            }
+        });
+
+        document.getElementById('fireworksToggleBtn').addEventListener('click', () => {
+            triggerFireworkBurst();
+            triggerFireworkBurst();
+        });
+
+        function animateFireworks() {
+            ctx.fillStyle = 'rgba(23, 2, 2, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                if (p.alpha <= 0) {
+                    particles.splice(index, 1);
+                } else {
+                    p.update();
+                    p.draw();
+                }
+            });
+            requestAnimationFrame(animateFireworks);
+        }
+        animateFireworks();
+
+        setInterval(triggerFireworkBurst, 2500);
+    </script>
+</body>
+</html>
