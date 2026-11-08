@@ -12,7 +12,8 @@
 html, body {
     width: 100%;
     min-height: 100vh;
-    background: radial-gradient(circle at center, #7f1d1d 0%, #360707 60%, #170202 100%);
+    /* Dùng nền đỏ truyền thống đậm chất Tết giống phong cách ảnh mẫu */
+    background: linear-gradient(135deg, #880d1e 0%, #580c10 50%, #310406 100%);
     color: #fff;
     overflow-x: hidden;
     font-family: 'Montserrat', sans-serif;
@@ -20,21 +21,20 @@ html, body {
     padding: 0;
 }
 
-/* Biến toàn bộ trang thành khối kính đồng nhất tràn màn hình */
+/* Biến tất cả các khung card thành trong suốt hoàn toàn, không viền, không khung rời */
 .glass-card {
-    background: rgba(88, 10, 10, 0.90);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
     width: 100%;
 }
 
-/* Các card nhỏ bên trong bo góc nhẹ và có viền vàng mỏng sang trọng */
-.grid .glass-card, 
-main .glass-card {
-    border: 1px solid rgba(251, 191, 36, 0.25);
-    border-radius: 1.5rem;
+/* Riêng phần chứa chat hoặc nội dung cần nhấn mạnh thì cho nền đỏ sẫm mờ hòa vào nền chung, không viền cứng */
+#chatForm input {
+    background: rgba(40, 5, 5, 0.9) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
 }
 
 .gold-text-glow {
