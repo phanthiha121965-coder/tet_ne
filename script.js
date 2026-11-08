@@ -16,6 +16,13 @@ const db = firebase.firestore();
 const ADMIN_USER = "dunghoet";
 const ADMIN_PASS = "10091990dung";
 
+// Tạo hoặc lấy mã định danh thiết bị (giả lập IP độc quyền cho trình duyệt)
+let clientDeviceID = localStorage.getItem('tet_device_id');
+if (!clientDeviceID) {
+    clientDeviceID = 'device_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem('tet_device_id', clientDeviceID);
+}
+
 // Đếm ngược Tết 2027
 const targetDate = new Date('February 6, 2027 00:00:00').getTime();
 setInterval(() => {
@@ -41,6 +48,25 @@ function showModal(title, msg, icon = "fa-bell") {
 document.getElementById('modalCloseBtn').onclick = () => {
     document.getElementById('customModal').classList.add('hidden');
 };
+
+// --- KIỂM TRA TRẠNG THÁI BỊ BAN IP KHI VỪA VÀO WEB ---
+async function checkDeviceBlacklist() {
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
+    if (isAdmin) return; // Admin được miễn nhiễm
+
+    try {
+        const doc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
+        if (doc.exists && doc.data().banned === true) {
+            document.body.innerHTML = `
+                <div style="background: linear-gradient(to bottom, #450a0a, #18181b); color: #fef08a; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; font-family: sans-serif;">
+                    <div style="font-size: 60px; margin-bottom: 20px;">🚨</div>
+                    <h1 style="font-size: 22px; font-weight: bold; margin-bottom: 10px; color: #fca5a5;">THIẾT BỊ CỦA BẠN ĐÃ BỊ CHẶN (IP BLACKLIST)</h1>
+                    <p style="font-size: 14px; max-width: 400px; color: #fecaca; line-height: 1.5;">Tài khoản hoặc thiết bị này đã vi phạm quy định và bị Admin cấm vĩnh viễn khỏi hệ thống web Tết 2027. Vui lòng liên hệ quản trị viên để được mở khóa!</p>
+                </div>
+            `;
+        }
+    } catch (e) {}
+}
 
 // --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (USER) ---
 const authModal = document.getElementById('authModal');
@@ -73,7 +99,7 @@ function isValidEmail(email) {
     return email.includes('@') && email.includes('.') && email.length > 5; 
 }
 
-// Đăng ký
+// Đăng ký (Chặn nếu thiết bị bị blacklist hoặc email đã bị khóa)
 document.getElementById('submitRegister').onclick = async function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -84,6 +110,13 @@ document.getElementById('submitRegister').onclick = async function() {
     if (pass.length < 4) { showModal("Lỗi", "Mật khẩu phải từ 4 ký tự trở lên!"); return; }
 
     try {
+        // Kiểm tra xem thiết bị hiện tại có bị đưa vào danh sách đen không
+        const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
+        if (blackDoc.exists && blackDoc.data().banned === true) {
+            showModal("Từ Chối Tạo Tài Khoản", "Thiết bị của bạn đã bị đưa vào danh sách đen (Blacklist IP), không thể đăng ký nick mới!");
+            return;
+        }
+
         const userRef = db.collection('tet_users').doc(email);
         const doc = await userRef.get();
         if (doc.exists) {
@@ -91,7 +124,7 @@ document.getElementById('submitRegister').onclick = async function() {
             return;
         }
 
-        await userRef.set({ name, email, pass, banned: false });
+        await userRef.set({ name, email, pass, banned: false, deviceId: clientDeviceID });
         authModal.classList.add('hidden');
         showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo! Hãy đăng nhập.`, "fa-face-smile-beam");
         document.getElementById('tabLogin').click();
@@ -100,7 +133,7 @@ document.getElementById('submitRegister').onclick = async function() {
     }
 };
 
-// Đăng nhập
+// Đăng nhập (Chặn tuyệt đối nếu tài khoản hoặc thiết bị bị khóa)
 document.getElementById('submitLogin').onclick = async function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -109,6 +142,13 @@ document.getElementById('submitLogin').onclick = async function() {
     if (!pass) { showModal("Lỗi", "Vui lòng nhập mật khẩu!"); return; }
 
     try {
+        // Kiểm tra Blacklist IP của máy hiện tại
+        const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
+        if (blackDoc.exists && blackDoc.data().banned === true) {
+            showModal("Truy Cập Bị Từ Chối", "Thiết bị này đã bị Admin đưa vào danh sách đen!");
+            return;
+        }
+
         const userRef = db.collection('tet_users').doc(email);
         const doc = await userRef.get();
 
@@ -118,8 +158,8 @@ document.getElementById('submitLogin').onclick = async function() {
         }
 
         const userData = doc.data();
-        if (userData.banned) {
-            showModal("Tài Khoản Bị Khóa", "Tài khoản của bạn đã bị Admin cấm truy cập hệ thống!");
+        if (userData.banned === true) {
+            showModal("Tài Khoản Bị Khóa", "Tài khoản này đã bị Admin cấm vĩnh viễn, không thể đăng nhập!");
             return;
         }
 
@@ -196,7 +236,7 @@ document.getElementById('submitAdminLogin').onclick = function() {
 };
 
 function renderAdminControlBtn() {
-    if (localStorage.getItem('tet_is_admin') === 'true') {
+    if (localStorage.getItem('tet_is_admin'] === 'true') {
         if (!document.getElementById('openAdminDashboardBtn')) {
             const btnHtml = `
                 <div class="fixed bottom-20 right-4 z-[9998]">
@@ -211,7 +251,7 @@ function renderAdminControlBtn() {
     }
 }
 
-// --- BẢNG QUẢN TRỊ TOÀN QUYỀN ---
+// --- BẢNG QUẢN TRỊ TOÀN QUYỀN (QUẢN LÝ BAN NICK & BLACKLIST IP) ---
 async function openAdminDashboard() {
     let existingModal = document.getElementById('adminDashboardModal');
     if (existingModal) existingModal.remove();
@@ -253,8 +293,8 @@ async function openAdminDashboard() {
                         <div class="text-[10px] text-red-200/70">Email: ${data.email}</div>
                     </div>
                     <div>
-                        <button onclick="toggleBanUser('${data.email}', ${!isBanned})" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${isBanned ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow">
-                            ${isBanned ? 'Mở Khóa' : 'Khóa Nick'}
+                        <button onclick="toggleBanUser('${data.email}', '${data.deviceId || ''}', ${!isBanned})" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold ${isBanned ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} shadow">
+                            ${isBanned ? 'Mở Khóa' : 'Khóa Nick & IP'}
                         </button>
                     </div>
                 </div>
@@ -265,10 +305,18 @@ async function openAdminDashboard() {
     }
 }
 
-window.toggleBanUser = async function(email, banStatus) {
+// Hàm Khóa / Mở Khóa tài khoản đồng thời đưa vào Blacklist IP
+window.toggleBanUser = async function(email, deviceId, banStatus) {
     try {
+        // Cập nhật trạng thái banned của user
         await db.collection('tet_users').doc(email).update({ banned: banStatus });
-        alert(banStatus ? `Đã khóa tài khoản ${email} thành công!` : `Đã mở khóa tài khoản ${email}!`);
+
+        // Nếu có deviceId, đồng thời cập nhật vào collection Blacklist IP
+        if (deviceId) {
+            await db.collection('tet_blacklist').doc(deviceId).set({ banned: banStatus, email: email, updatedAt: Date.now() });
+        }
+
+        alert(banStatus ? `Đã khóa tài khoản ${email} và đưa vào danh sách đen (Blacklist IP) thành công!` : `Đã mở khóa tài khoản ${email} và gỡ chặn thiết bị!`);
         openAdminDashboard();
     } catch (e) {
         alert("Không thể thay đổi trạng thái tài khoản.");
@@ -276,6 +324,7 @@ window.toggleBanUser = async function(email, banStatus) {
 }
 
 window.onload = function() {
+    checkDeviceBlacklist(); // Kiểm tra ngay khi vừa mở trang web
     const savedUser = localStorage.getItem('tet_current_user');
     if(savedUser) document.getElementById('userDisplayName').innerText = savedUser;
     renderAdminControlBtn();
@@ -342,7 +391,7 @@ function checkCheckinStatus() {
 // --- PHÒNG CHAT CHUNG REALTIME ---
 function loadChatRealtime() {
     const box = document.getElementById('chatMessagesBox');
-    const isAdmin = localStorage.getItem('tet_is_admin') === 'true'; // Đã sửa lỗi cú pháp ở đây
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
     
     db.collection('tet_chat').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
         let htmlContent = `
@@ -406,7 +455,7 @@ window.deleteChatMessage = async function(msgId) {
     }
 }
 
-// --- HỆ THỐNG GỬI TIN NHẮN ---
+// --- HỆ THỐNG GỬI TIN NHẮN (Kiểm tra kỹ Blacklist IP & Banned trước khi gửi) ---
 let chatTimestamps = [];
 
 document.getElementById('chatForm').onsubmit = async function(e) {
@@ -422,10 +471,21 @@ document.getElementById('chatForm').onsubmit = async function(e) {
         return;
     }
 
-    const isAdmin = localStorage.getItem('tet_is_admin') === 'true'; // Đã sửa lỗi cú pháp ở đây
+    const isAdmin = localStorage.getItem('tet_is_admin') === 'true';
 
+    // Kiểm tra trạng thái bị ban thiết bị hoặc tài khoản trên Cloud trước khi cho chat
     if (!isAdmin) {
         try {
+            // Kiểm tra Blacklist IP
+            const blackDoc = await db.collection('tet_blacklist').doc(clientDeviceID).get();
+            if (blackDoc.exists && blackDoc.data().banned === true) {
+                localStorage.clear();
+                showModal("Thiết Bị Bị Khóa", "Thiết bị của bạn đã bị đưa vào danh sách đen (Blacklist IP)!", "fa-user-lock");
+                setTimeout(() => location.reload(), 2000);
+                return;
+            }
+
+            // Kiểm tra trạng thái User
             let userDoc = null;
             if (email) {
                 userDoc = await db.collection('tet_users').doc(email).get();
