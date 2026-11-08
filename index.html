@@ -663,6 +663,7 @@
             triggerFireworkBurst();
         });
 
+        // --- XỬ LÝ MODAL ĐĂNG NHẬP / ĐĂNG KÝ (ĐÃ SỬA CHUẨN XÁC) ---
         const authModal = document.getElementById('authModal');
         const openAuthBtn = document.getElementById('openAuthModalBtn');
         const userDropdownMenu = document.getElementById('userDropdownMenu');
@@ -671,7 +672,8 @@
         const formLogin = document.getElementById('formLogin');
         const formRegister = document.getElementById('formRegister');
 
-        openAuthBtn.addEventListener('click', () => {
+        openAuthBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const saved = localStorage.getItem('tet_username');
             if (saved) {
                 userDropdownMenu.classList.toggle('hidden');
@@ -680,7 +682,9 @@
             }
         });
 
-        document.getElementById('closeAuthModal').addEventListener('click', () => authModal.classList.add('hidden'));
+        document.getElementById('closeAuthModal').addEventListener('click', () => {
+            authModal.classList.add('hidden');
+        });
 
         tabLogin.addEventListener('click', () => {
             tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 transition";
@@ -760,6 +764,9 @@
         });
 
         window.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.add('hidden');
+            }
             if (!document.getElementById('authStatusContainer').contains(e.target)) {
                 userDropdownMenu.classList.add('hidden');
             }
