@@ -21,7 +21,7 @@ function showModal(title, msg, icon = "fa-bell") {
 }
 document.getElementById('modalCloseBtn').onclick = () => document.getElementById('customModal').classList.add('hidden');
 
-// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN VÀ MÃ OTP GỬI GMAIL ---
+// --- HỆ THỐNG XÁC THỰC TÀI KHOẢN (TRỰC TIẾP KHÔNG CẦN OTP) ---
 const authModal = document.getElementById('authModal');
 document.getElementById('openAuthModalBtn').onclick = (e) => {
     e.stopPropagation();
@@ -55,8 +55,7 @@ function getUsersDB() {
     return JSON.parse(localStorage.getItem('tet_users_database')) || [];
 }
 
-let pendingVerification = null;
-
+// 1. ĐĂNG KÝ TRỰC TIẾP
 document.getElementById('submitRegister').onclick = function() {
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -64,7 +63,7 @@ document.getElementById('submitRegister').onclick = function() {
 
     if (!name) { showModal("Lỗi", "Vui lòng nhập tên hiển thị!"); return; }
     if (!isValidEmail(email)) { 
-        showModal("Lỗi Định Dạng", "Email bắt buộc phải có đuôi @gmail.com hợp lệ, không được nhập bậy!"); 
+        showModal("Lỗi Định Dạng", "Email bắt buộc phải có đuôi @gmail.com hợp lệ!"); 
         return; 
     }
     if (pass.length < 6) { showModal("Lỗi", "Mật khẩu phải từ 6 ký tự trở lên!"); return; }
@@ -75,38 +74,14 @@ document.getElementById('submitRegister').onclick = function() {
         return;
     }
 
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    pendingVerification = { name, email, pass, otpCode };
+    users.push({ name: name, email: email, pass: pass });
+    localStorage.setItem('tet_users_database', JSON.stringify(users));
 
-    showModal("Đã Gửi Mã Đến Gmail", `Mã xác nhận 6 số đã được gửi tới hộp thư ${email}.\n\n(Mã OTP thử nghiệm của bạn là: ${otpCode})`, "fa-envelope-circle-check");
-    
-    document.getElementById('formRegister').innerHTML = `
-        <h3 class="font-serif text-base font-bold text-yellow-300 text-center mb-2">Nhập Mã Xác Nhận Gmail</h3>
-        <p class="text-[11px] text-red-200 text-center mb-3">Kiểm tra hộp thư Gmail của ${email}</p>
-        <input type="text" id="otpInput" placeholder="Nhập mã OTP 6 chữ số..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm text-center tracking-widest font-bold">
-        <button id="verifyOtpBtn" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-800 text-white font-bold rounded-xl text-sm uppercase cursor-pointer mt-2">Xác Nhận Đăng Ký</button>
-    `;
-
-    document.getElementById('verifyOtpBtn').onclick = function() {
-        const enteredOtp = document.getElementById('otpInput').value.trim();
-        if (enteredOtp !== pendingVerification.otpCode) {
-            showModal("Sai Mã OTP", "Mã xác nhận không chính xác. Vui lòng kiểm tra lại!", "fa-triangle-exclamation");
-            return;
-        }
-
-        let usersList = getUsersDB();
-        usersList.push({ 
-            name: pendingVerification.name, 
-            email: pendingVerification.email, 
-            pass: pendingVerification.pass 
-        });
-        localStorage.setItem('tet_users_database', JSON.stringify(usersList));
-
-        showModal("Đăng Ký Thành Công", `Tài khoản ${pendingVerification.name} đã được kích hoạt! Hãy đăng nhập.`, "fa-face-smile-beam");
-        location.reload();
-    };
+    showModal("Đăng Ký Thành Công", `Tài khoản ${name} đã được tạo thành công! Hãy chuyển sang tab Đăng Nhập.`, "fa-face-smile-beam");
+    document.getElementById('tabLogin').click();
 };
 
+// 2. ĐĂNG NHẬP
 document.getElementById('submitLogin').onclick = function() {
     const email = document.getElementById('loginEmail').value.trim();
     const pass = document.getElementById('loginPass').value.trim();
@@ -191,7 +166,7 @@ function checkCheckinStatus() {
     const lastCheckin = localStorage.getItem('tet_last_checkin_' + username);
 
     if (username && lastCheckin === today) {
-        statusBox.innerText = "✅ Hôm nay đã điểm danh!";
+        checkinStatusBox.innerText = "✅ Hôm nay đã điểm danh!";
         checkinBtn.innerText = "Đã Điểm Danh";
         checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
     } else {
@@ -245,6 +220,10 @@ document.getElementById('rutQueBtn').onclick = function() {
     document.getElementById('queResultBox').innerText = randomQue;
     showModal("Quẻ Thẻ Đầu Năm 2027", randomQue, "fa-scroll");
     triggerFireworkBurst();
+};
+
+document.getElementById('supportBtn').onclick = function() {
+    window.open(MY_LINK4M_URL, '_blank');
 };
 
 // --- PHÒNG CHAT CHUNG (Tự xoá sau 5 phút) ---
