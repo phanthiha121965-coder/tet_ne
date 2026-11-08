@@ -1,4 +1,4 @@
-/* Thiết lập tràn viền tuyệt đối cho toàn trang */
+/* Thiết lập tràn viền tuyệt đối */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,8 +12,7 @@
 html, body {
     width: 100%;
     min-height: 100vh;
-    /* Dùng nền đỏ truyền thống đậm chất Tết giống phong cách ảnh mẫu */
-    background: linear-gradient(135deg, #880d1e 0%, #580c10 50%, #310406 100%);
+    background: radial-gradient(circle at center, #7f1d1d 0%, #360707 60%, #170202 100%);
     color: #fff;
     overflow-x: hidden;
     font-family: 'Montserrat', sans-serif;
@@ -21,25 +20,21 @@ html, body {
     padding: 0;
 }
 
-/* Biến tất cả các khung card thành trong suốt hoàn toàn, không viền, không khung rời */
+/* Khung kính mờ cao cấp: Ôm trọn không gian, sang trọng, không bị thô cứng */
 .glass-card {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: linear-gradient(135deg, rgba(88, 10, 10, 0.75) window, rgba(40, 5, 5, 0.85) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(251, 191, 36, 0.1);
+    border-radius: 1.75rem;
     width: 100%;
 }
 
-/* Riêng phần chứa chat hoặc nội dung cần nhấn mạnh thì cho nền đỏ sẫm mờ hòa vào nền chung, không viền cứng */
-#chatForm input {
-    background: rgba(40, 5, 5, 0.9) !important;
-    border: 1px solid rgba(251, 191, 36, 0.4) !important;
-}
-
+/* Hiệu ứng chữ vàng phát sáng rực rỡ */
 .gold-text-glow {
     color: #fde68a;
-    text-shadow: 0 0 10px rgba(251, 191, 36, 0.6), 0 0 20px rgba(217, 119, 6, 0.4);
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.7), 0 0 25px rgba(217, 119, 6, 0.5);
 }
 
 .red-text-glow {
@@ -47,8 +42,8 @@ html, body {
 }
 
 @keyframes pulseGlow {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.03); }
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
 }
 .animate-pulse-glow { animation: pulseGlow 3s infinite ease-in-out; }
 
