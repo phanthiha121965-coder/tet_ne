@@ -13,6 +13,10 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK (Realtime Database 100% Online) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -256,7 +260,7 @@
                         </button>
                     </section>
 
-                    <!-- 4. Bảng Vàng Xông Đất Đồng Bộ (Xếp theo số ngày điểm danh) -->
+                    <!-- 4. Bảng Vàng Xông Đất Realtime Online -->
                     <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center relative">
                         <div>
                             <div class="w-12 h-12 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-xl">
@@ -266,13 +270,13 @@
                             <p class="text-xs text-red-200 mb-3">Xếp hạng theo số ngày điểm danh.</p>
                         </div>
                         <div id="leaderboardList" class="my-1 p-2 rounded-lg bg-red-950/80 border border-yellow-500/30 text-yellow-200 text-[11px] max-h-32 overflow-y-auto space-y-1 w-full text-left">
-                            <div class="text-center text-red-300/60 py-2">Đang tải bảng vàng...</div>
+                            <div class="text-center text-red-300/60 py-2">Đang kết nối đám mây...</div>
                         </div>
                     </section>
 
                 </div>
 
-                <!-- Cột phải: KHUNG CHAT TẾT TELEGRAM STYLE CHUNG TOÀN QUỐC -->
+                <!-- Cột phải: KHUNG CHAT TẾT TELEGRAM STYLE 100% ONLINE -->
                 <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl relative h-[420px]">
                     
                     <!-- Header Chat Telegram -->
@@ -284,7 +288,7 @@
                             <div class="text-left">
                                 <h3 class="font-serif text-sm font-bold text-yellow-300 leading-tight">Phòng Chat Chung Toàn Quốc</h3>
                                 <span class="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Trực tuyến (Xoá sau 5 phút)
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Online 100% (Xoá sau 5 phút)
                                 </span>
                             </div>
                         </div>
@@ -293,15 +297,15 @@
                         </button>
                     </div>
 
-                    <!-- Khung Nội Dung Tin Nhắn Chung -->
+                    <!-- Khung Nội Dung Tin Nhắn Realtime -->
                     <div id="chatMessagesBox" class="flex-grow my-3 overflow-y-auto space-y-3 pr-1 text-xs">
-                        <div class="text-center text-xs text-yellow-200/60 py-4">Đang tải tin nhắn chung...</div>
+                        <div class="text-center text-xs text-yellow-200/60 py-4">Đang kết nối tin nhắn online...</div>
                     </div>
 
                     <!-- Khung Nhập Tin Nhắn Telegram Style -->
                     <div class="pt-2 border-t border-yellow-500/20">
                         <form id="chatForm" class="flex items-center gap-2">
-                            <input type="text" id="chatInput" placeholder="Nhập lời chúc chung..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-xs focus:outline-none focus:border-yellow-400">
+                            <input type="text" id="chatInput" placeholder="Nhập lời chúc online..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 placeholder-red-300/40 text-xs focus:outline-none focus:border-yellow-400">
                             <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-red-950 font-bold flex items-center justify-center shadow-lg transition active:scale-95 flex-shrink-0 cursor-pointer">
                                 <i class="fa-solid fa-paper-plane text-xs"></i>
                             </button>
@@ -369,13 +373,16 @@
         </div>
     </div>
 
-    <!-- JavaScript Xử Lý Kho Lưu Trữ Đám Mây Chung (JSONBin) -->
+    <!-- JavaScript Cấu Hình Firebase Realtime Database -->
     <script>
         const MY_LINK4M_URL = "https://link4m.net/JtoYhsH";
-        
-        // Sử dụng JSONBin công khai miễn phí để mọi người chung 1 data bảng vàng & chat
-        const BIN_ID = "6790a88ead19ca34f8f41123"; 
-        const API_KEY = "$2a$10$X... (public)";
+
+        // Cấu hình kết nối Firebase Realtime Database công khai miễn phí
+        const firebaseConfig = {
+            databaseURL: "https://tet-2027-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         function showModal(title, message, iconClass = "fa-bell") {
             document.getElementById('modalTitle').innerText = title;
@@ -419,7 +426,6 @@
                 homeSection.classList.add('hidden');
                 thankyouSection.classList.remove('hidden');
             }
-            loadGlobalData();
             checkCheckinStatus();
         });
 
@@ -457,48 +463,27 @@
             }
         };
 
-        // --- HỆ THỐNG DỮ LIỆU CHUNG (LOCALSTORAGE ĐỒNG BỘ ĐÁM MÂY GIẢ LẬP) ---
-        function getGlobalData() {
-            let data = JSON.parse(localStorage.getItem('tet_global_shared_data'));
-            if (!data) {
-                data = {
-                    leaderboard: [
-                        { name: "Admin", streak: 5 },
-                        { name: "Phan Dũng", streak: 3 }
-                    ],
-                    messages: [
-                        { sender: "Admin Web Tết 🧧", text: "Chào mừng các anh gia nhập phòng chat chung toàn quốc!", time: "Vừa xong", timestamp: Date.now() }
-                    ]
-                };
-                localStorage.setItem('tet_global_shared_data', JSON.stringify(data));
-            }
-            return data;
-        }
-
-        function saveGlobalData(data) {
-            localStorage.setItem('tet_global_shared_data', JSON.stringify(data));
-        }
-
-        // Tải dữ liệu bảng vàng và chat chung
-        function loadGlobalData() {
-            const data = getGlobalData();
-            renderLeaderboard(data.leaderboard);
-            renderChatMessages(data.messages);
-        }
-
-        // --- BẢNG VÀNG XẾP HẠNG THEO SỐ NGÀY ĐIỂM DANH ---
-        function renderLeaderboard(leaderboard) {
+        // --- BẢNG VÀNG REALTIME ĐỒNG BỘ 100% ONLINE ---
+        const leaderboardRef = db.ref('leaderboard');
+        leaderboardRef.on('value', (snapshot) => {
+            const data = snapshot.val() || {};
             const listContainer = document.getElementById('leaderboardList');
-            // Sắp xếp giảm dần theo số ngày điểm danh (streak)
-            leaderboard.sort((a, b) => b.streak - a.streak);
+            
+            let usersArray = [];
+            for (let key in data) {
+                usersArray.push(data[key]);
+            }
 
-            if (leaderboard.length === 0) {
+            // Sắp xếp giảm dần theo số ngày điểm danh (streak)
+            usersArray.sort((a, b) => b.streak - a.streak);
+
+            if (usersArray.length === 0) {
                 listContainer.innerHTML = `<div class="text-center text-xs text-red-300/60 py-2">Chưa có ai điểm danh.</div>`;
                 return;
             }
 
             listContainer.innerHTML = "";
-            leaderboard.forEach((item, index) => {
+            usersArray.forEach((item, index) => {
                 let medalColor = "text-yellow-300";
                 if(index === 0) medalColor = "text-yellow-400 font-extrabold";
                 else if(index === 1) medalColor = "text-gray-300 font-bold";
@@ -515,7 +500,7 @@
                 `;
                 listContainer.appendChild(row);
             });
-        }
+        });
 
         // Điểm danh hàng ngày
         const checkinBtn = document.getElementById('checkinBtn');
@@ -557,40 +542,57 @@
             checkinBtn.innerText = "Đã Điểm Danh";
             checkinBtn.classList.add('opacity-50', 'cursor-not-allowed');
             
-            // Cập nhật số ngày điểm danh trên bảng vàng chung
-            let globalData = getGlobalData();
-            let userEntry = globalData.leaderboard.find(i => i.name === username);
-            if (userEntry) {
-                userEntry.streak += 1;
-            } else {
-                globalData.leaderboard.push({ name: username, streak: 1 });
-            }
-            saveGlobalData(globalData);
-            loadGlobalData();
+            // Cập nhật lên Firebase Realtime Database
+            const userRef = db.ref('leaderboard/' + username.replace(/[.#$[\]]/g, "_"));
+            userRef.once('value', (snapshot) => {
+                let currentStreak = 1;
+                if (snapshot.exists()) {
+                    currentStreak = (snapshot.val().streak || 0) + 1;
+                }
+                userRef.set({ name: username, streak: currentStreak });
+            });
 
-            showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh tăng 1 ngày streak lên bảng vàng toàn quốc!`, "fa-award");
+            showModal("Điểm Danh Thành Công", `Chúc mừng ${username} đã điểm danh tăng ngày streak lên bảng vàng toàn quốc!`, "fa-award");
             triggerFireworkBurst();
         };
 
-        // --- PHÒNG CHAT CHUNG TOÀN QUỐC (Tự xoá sau 5 phút & tối đa 50 tin) ---
+        // --- PHÒNG CHAT CHUNG REALTIME (Tự xoá sau 5 phút & tối đa 50 tin) ---
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
         const chatMessagesBox = document.getElementById('chatMessagesBox');
+        const messagesRef = db.ref('messages');
 
-        function renderChatMessages(messages) {
-            const now = Date.now();
-            // Lọc bỏ tin nhắn quá 5 phút (300,000 ms)
-            let validMessages = messages.filter(msg => (now - msg.timestamp) < 300000);
-            
+        messagesRef.on('value', (snapshot) => {
+            const data = snapshot.val() || {};
             chatMessagesBox.innerHTML = "";
-            if (validMessages.length === 0) {
+
+            let messagesArray = [];
+            const now = Date.now();
+
+            for (let key in data) {
+                let msg = data[key];
+                // Tự động lọc bỏ tin nhắn quá 5 phút (300,000 ms)
+                if ((now - msg.timestamp) < 300000) {
+                    messagesArray.push(msg);
+                } else {
+                    // Xoá tin nhắn cũ trên database
+                    db.ref('messages/' + key).remove();
+                }
+            }
+
+            // Giới hạn hiển thị 50 tin nhắn gần nhất
+            if (messagesArray.length > 50) {
+                messagesArray = messagesArray.slice(messagesArray.length - 50);
+            }
+
+            if (messagesArray.length === 0) {
                 chatMessagesBox.innerHTML = `<div class="text-center text-xs text-yellow-200/60 py-4">Chưa có tin nhắn nào gần đây...</div>`;
                 return;
             }
 
             const currentUsername = localStorage.getItem('tet_username');
 
-            validMessages.forEach(msg => {
+            messagesArray.forEach(msg => {
                 const isSelf = msg.sender === currentUsername;
                 const msgDiv = document.createElement('div');
                 msgDiv.className = `flex items-start gap-2 ${isSelf ? 'flex-row-reverse' : ''}`;
@@ -612,7 +614,7 @@
                 chatMessagesBox.appendChild(msgDiv);
             });
             chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
-        }
+        });
 
         chatForm.onsubmit = function(e) {
             e.preventDefault();
@@ -629,25 +631,17 @@
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const timestamp = Date.now();
 
-            let globalData = getGlobalData();
-            globalData.messages.push({ sender: username, text: text, time: timeStr, timestamp: timestamp });
-            
-            // Giới hạn tối đa 50 tin nhắn
-            if (globalData.messages.length > 50) {
-                globalData.messages = globalData.messages.slice(globalData.messages.length - 50);
-            }
-
-            saveGlobalData(globalData);
-            loadGlobalData();
+            // Đẩy tin nhắn mới lên Firebase Realtime Database
+            messagesRef.push({
+                sender: username,
+                text: text,
+                time: timeStr,
+                timestamp: timestamp
+            });
 
             chatInput.value = "";
             triggerFireworkBurst();
         };
-
-        // Tự động làm mới tin nhắn & bảng vàng mỗi 10 giây để đồng bộ toàn quốc
-        setInterval(() => {
-            loadGlobalData();
-        }, 10000);
 
         const queList = [
             "Quẻ Đại Cát: Công thành danh toạ, tài lộc dồi dào, vạn sự hanh thông suốt cả năm Đinh Mùi!",
@@ -721,16 +715,16 @@
             localStorage.setItem('tet_username', username);
             document.getElementById('userDisplayName').innerText = username;
             authModal.classList.add('hidden');
-            
-            // Đảm bảo user mới đăng nhập có tên trên bảng vàng
-            let globalData = getGlobalData();
-            if (!globalData.leaderboard.some(i => i.name === username)) {
-                globalData.leaderboard.push({ name: username, streak: 0 });
-                saveGlobalData(globalData);
-            }
+
+            // Đảm bảo user có mặt trên bảng vàng Firebase
+            const userRef = db.ref('leaderboard/' + username.replace(/[.#$[\]]/g, "_"));
+            userRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    userRef.set({ name: username, streak: 0 });
+                }
+            });
 
             showModal("Đăng Nhập Thành Công", `Chào mừng bạn trở lại, ${username}!`, "fa-face-smile-beam");
-            loadGlobalData();
             checkCheckinStatus();
         };
 
@@ -756,14 +750,14 @@
             document.getElementById('userDisplayName').innerText = name;
             authModal.classList.add('hidden');
 
-            let globalData = getGlobalData();
-            if (!globalData.leaderboard.some(i => i.name === name)) {
-                globalData.leaderboard.push({ name: name, streak: 0 });
-                saveGlobalData(globalData);
-            }
+            const userRef = db.ref('leaderboard/' + name.replace(/[.#$[\]]/g, "_"));
+            userRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    userRef.set({ name: name, streak: 0 });
+                }
+            });
 
             showModal("Đăng Ký Thành Công", `Chào mừng thành viên mới ${name} gia nhập đại gia đình Tết 2027!`, "fa-champagne-glasses");
-            loadGlobalData();
             checkCheckinStatus();
         };
 
