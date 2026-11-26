@@ -1,484 +1,1467 @@
-```html
 <!DOCTYPE html>
-<html lang="vi" class="dark">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOXBOOST - Shop Cày Thuê Blox Fruits Online</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLOXBOOST - Shop Dịch Vụ Cày Thuê Blox Fruits</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --bg-void: #07050a;
+      --bg-panel: #120b14;
+      --accent-crimson: #ef4444;
+      --accent-ember: #f97316;
+      --accent-violet: #a855f7;
+    }
 
-    <!-- Firebase Firestore Compat SDK (Cloud Online Persistence) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    * {
+      box-sizing: border-box;
+    }
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        gaming: ['Rajdhani', 'sans-serif'],
-                    },
-                    colors: {
-                        cosmic: {
-                            950: '#05050a',
-                            900: '#0b0b14',
-                            800: '#131320',
-                            700: '#1c1c2e',
-                        }
-                    }
-                }
-            }
-        };
-    </script>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: var(--bg-void);
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+    }
 
-    <style>
-        /* Dark Cosmic + Gothic Red/Black + Subtle RGB Neon */
-        * {
-            box-sizing: border-box;
-        }
+    .cosmic-bg {
+      background:
+        radial-gradient(circle at 15% 15%, rgba(239, 68, 68, 0.16), transparent 42%),
+        radial-gradient(circle at 85% 20%, rgba(168, 85, 247, 0.14), transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(220, 38, 38, 0.12), transparent 50%),
+        var(--bg-void);
+    }
 
-        html, body {
-            width: 100%;
-            max-width: 100vw;
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-        }
+    .rgb-border-top {
+      position: relative;
+    }
 
-        body {
-            background-color: #05050a;
-            background-image:
-                radial-gradient(circle at 14% 12%, rgba(220, 38, 38, 0.2) 0%, transparent 42%),
-                radial-gradient(circle at 86% 18%, rgba(139, 92, 246, 0.16) 0%, transparent 45%),
-                radial-gradient(circle at 50% 90%, rgba(239, 68, 68, 0.12) 0%, transparent 48%);
-            background-attachment: fixed;
-            color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
-        }
+    .rgb-border-top::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #a855f7, #ef4444);
+      background-size: 200% 100%;
+      animation: rgbSlide 5s linear infinite;
+    }
 
-        .glass-card {
-            background: rgba(16, 16, 28, 0.88);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+    @keyframes rgbSlide {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
 
-        @keyframes rgbNeonPulse {
-            0% {
-                border-color: rgba(239, 68, 68, 0.45);
-                box-shadow: 0 0 18px rgba(239, 68, 68, 0.22), inset 0 0 12px rgba(239, 68, 68, 0.06);
-            }
-            33% {
-                border-color: rgba(168, 85, 247, 0.45);
-                box-shadow: 0 0 18px rgba(168, 85, 247, 0.22), inset 0 0 12px rgba(168, 85, 247, 0.06);
-            }
-            66% {
-                border-color: rgba(34, 211, 238, 0.42);
-                box-shadow: 0 0 18px rgba(34, 211, 238, 0.18), inset 0 0 12px rgba(34, 211, 238, 0.06);
-            }
-            100% {
-                border-color: rgba(239, 68, 68, 0.45);
-                box-shadow: 0 0 18px rgba(239, 68, 68, 0.22), inset 0 0 12px rgba(239, 68, 68, 0.06);
-            }
-        }
+    .gothic-card {
+      background: linear-gradient(160deg, rgba(26, 12, 22, 0.92), rgba(11, 8, 16, 0.95));
+      border: 1px solid rgba(239, 68, 68, 0.28);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+    }
 
-        .rgb-border {
-            animation: rgbNeonPulse 7s linear infinite;
-        }
+    .gothic-card:hover {
+      border-color: rgba(248, 113, 113, 0.55);
+    }
 
-        .rgb-top-strip {
-            height: 3px;
-            width: 100%;
-            background: linear-gradient(90deg, #ef4444, #a855f7, #06b6d4, #ef4444);
-            background-size: 300% 100%;
-            animation: rgbStripFlow 6s linear infinite;
-        }
+    #drawerBackdrop {
+      display: none;
+      pointer-events: none;
+      z-index: 90;
+    }
 
-        @keyframes rgbStripFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-        }
+    #drawerBackdrop.open {
+      display: block;
+      pointer-events: auto;
+    }
 
-        /* Fixed Top Header & Guaranteed 3-Line Hamburger Button (#hamburgerBtn) */
-        .top-header-bar {
-            position: sticky;
-            top: 0;
-            z-index: 55;
-            width: 100%;
-            background: rgba(11, 11, 20, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(239, 68, 68, 0.28);
-        }
+    #sideDrawer {
+      transform: translateX(-100%);
+      transition: transform 0.24s ease;
+      z-index: 100;
+    }
 
-        #hamburgerBtn {
-            position: relative;
-            z-index: 60;
-            min-width: 44px;
-            min-height: 44px;
-            width: 44px;
-            height: 44px;
-            flex-shrink: 0;
-            pointer-events: auto;
-            touch-action: manipulation;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(239, 68, 68, 0.14);
-            border: 1px solid rgba(239, 68, 68, 0.45);
-            color: #fca5a5;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-        }
+    #sideDrawer.open {
+      transform: translateX(0);
+    }
 
-        #hamburgerBtn:hover,
-        #hamburgerBtn:focus-visible {
-            background: rgba(239, 68, 68, 0.28);
-            border-color: #ef4444;
-            color: #ffffff;
-        }
+    .nav-pill.active {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.32), rgba(153, 27, 27, 0.22));
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #ffffff;
+    }
 
-        /* Drawer Backdrop (#drawerBackdrop): Strictly Hidden by Default */
-        #drawerBackdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 90;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            pointer-events: none;
-        }
-
-        #drawerBackdrop.open {
-            display: block;
-            pointer-events: auto;
-        }
-
-        /* Side Drawer (#sideDrawer) */
-        #sideDrawer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 315px;
-            max-width: 85vw;
-            z-index: 100;
-            transform: translateX(-100%);
-            transition: transform 0.25s ease;
-            pointer-events: auto;
-            background: rgba(12, 12, 22, 0.98);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-right: 1px solid rgba(239, 68, 68, 0.35);
-            box-shadow: 12px 0 38px rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        #sideDrawer.open {
-            transform: translateX(0);
-        }
-
-        /* Modal Overlays */
-        .overlay-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 125;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            pointer-events: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .overlay-modal.open {
-            display: flex;
-            pointer-events: auto;
-        }
-
-        /* Separated Screens: Only One Active at a Time */
-        .screen-view {
-            display: none;
-        }
-
-        .screen-view.active {
-            display: block;
-        }
-
-        /* Standalone Customer vs Admin Workspace Shell */
-        #customerWorkspaceShell.workspace-hidden,
-        #adminWorkspaceShell.workspace-hidden {
-            display: none !important;
-        }
-
-        .admin-topbar {
-            position: sticky;
-            top: 0;
-            z-index: 65;
-            width: 100%;
-            background: rgba(14, 7, 14, 0.96);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(245, 158, 11, 0.35);
-        }
-
-        ::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b0b14;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #282840;
-            border-radius: 999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ef4444;
-        }
-    </style>
+    .admin-tab.active {
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.35), rgba(126, 34, 206, 0.25));
+      border-color: rgba(251, 113, 133, 0.85);
+      color: #ffffff;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+<body class="cosmic-bg text-slate-100">
 
-    <!-- Top RGB Neon Strip -->
-    <div class="rgb-top-strip"></div>
+  <!-- ==================== KHÔNG GIAN 1: SHOP KHÁCH HÀNG ==================== -->
+  <div id="customerWorkspaceShell" class="min-h-screen flex flex-col">
+    <!-- Thanh Header Shop -->
+    <header class="sticky top-0 z-50 rgb-border-top bg-[#0c0710]/95 backdrop-blur-md">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <!-- Nút 3 gạch luôn rõ ràng, bấm mở ngăn điều hướng -->
+          <button
+            id="hamburgerBtn"
+            type="button"
+            aria-label="Mở menu điều hướng"
+            class="w-11 h-11 shrink-0 rounded-xl bg-red-950/80 hover:bg-red-900/90 border border-red-500/50 text-red-200 flex items-center justify-center transition active:scale-95 cursor-pointer"
+            style="z-index: 60; pointer-events: auto;"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
 
-    <!-- =====================================================================
-         A. STANDALONE CUSTOMER SHOP WORKSPACE (#customerWorkspaceShell)
-         ===================================================================== -->
-    <div id="customerWorkspaceShell" class="flex-grow flex flex-col">
-
-        <!-- 1. FIXED / STICKY TOP HEADER BAR (CUSTOMER) -->
-        <header class="top-header-bar">
-            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16 sm:h-20 gap-2">
-
-                    <!-- Left Cluster: 3-Line Hamburger Button (#hamburgerBtn) + Secret 10-Tap Logo (#brandSecretTrigger) -->
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <button
-                            id="hamburgerBtn"
-                            type="button"
-                            aria-label="Mở hoặc đóng menu điều hướng"
-                            aria-controls="sideDrawer"
-                            aria-expanded="false"
-                        >
-                            <!-- Custom SVG 3-Line Hamburger Icon -->
-                            <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </svg>
-                        </button>
-
-                        <!-- Brand Emblem + BLOXBOOST (10 Taps in 1.8s -> Secret PIN Modal) -->
-                        <div
-                            id="brandSecretTrigger"
-                            role="button"
-                            tabindex="0"
-                            aria-label="Logo BLOXBOOST"
-                            class="flex items-center gap-2 min-w-0 cursor-pointer select-none"
-                        >
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 via-red-800 to-purple-900 border border-red-400/40 flex items-center justify-center shrink-0 shadow-md shadow-red-950/60 pointer-events-none">
-                                <!-- Custom SVG Gothic Crescent Blade Logo -->
-                                <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                                    <polygon points="12 2 19 8.5 15.5 21 8.5 21 5 8.5 12 2"></polygon>
-                                    <line x1="12" y1="2" x2="12" y2="21"></line>
-                                    <circle cx="12" cy="11.5" r="2.2" fill="currentColor"></circle>
-                                </svg>
-                            </div>
-                            <div class="min-w-0 pointer-events-none">
-                                <div class="font-gaming font-extrabold text-lg sm:text-2xl tracking-wider text-white leading-none truncate">
-                                    BLOX<span class="text-red-500">BOOST</span>
-                                </div>
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold hidden sm:block">
-                                    Blox Fruits Real Orders
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Cluster: Cloud Sync Status + Account & Order History Controls -->
-                    <div id="headerRightActions" class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                        <!-- Rendered dynamically via JS -->
-                    </div>
-                </div>
+          <!-- Vùng logo: bấm 10 lần liên tiếp mở modal PIN Admin -->
+          <button
+            id="brandSecretTrigger"
+            type="button"
+            class="flex items-center gap-2.5 text-left min-w-0 cursor-pointer select-none focus:outline-none"
+          >
+            <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-red-600 via-rose-600 to-purple-700 p-0.5 shadow-lg shadow-red-950/70">
+              <div class="w-full h-full rounded-[10px] bg-[#120812] flex items-center justify-center text-red-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3z" />
+                  <circle cx="12" cy="11" r="2" />
+                  <path d="M12 13v4" />
+                </svg>
+              </div>
             </div>
-        </header>
-
-        <!-- 2. DRAWER BACKDROP (#drawerBackdrop) & SIDE DRAWER (#sideDrawer) -->
-        <div id="drawerBackdrop" aria-hidden="true"></div>
-
-        <aside id="sideDrawer" aria-label="Menu điều hướng ngăn kéo">
-            <div class="p-5 overflow-y-auto space-y-5">
-                <!-- Drawer Header -->
-                <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                                <polygon points="12 2 19 8.5 15.5 21 8.5 21 5 8.5 12 2"></polygon>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-gaming font-extrabold text-lg text-white tracking-wider">MENU CHÍNH</div>
-                            <div class="text-[11px] text-gray-400">Chọn mục cần mở</div>
-                        </div>
-                    </div>
-
-                    <button
-                        id="closeDrawerBtn"
-                        type="button"
-                        aria-label="Đóng menu ngăn kéo"
-                        class="w-9 h-9 rounded-lg bg-white/5 hover:bg-red-600/25 border border-white/10 hover:border-red-500/40 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer"
-                    >
-                        <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Separate Screen Navigation Items -->
-                <div class="space-y-2">
-                    <button type="button" onclick="navigateToScreen('cay-thue')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-red-950/50 border border-white/10 hover:border-red-500/40 transition-all flex items-center justify-between cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
-                                <!-- Custom SVG Lightning Icon -->
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                                </svg>
-                            </span>
-                            <div>
-                                <div class="font-bold text-sm text-white">Cày Thuê</div>
-                                <div class="text-[11px] text-gray-400">Max Lv 20k • Trái Full 15k</div>
-                            </div>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-500 group-hover:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
-
-                    <button type="button" onclick="navigateToScreen('ho-tro')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-cyan-950/40 border border-white/10 hover:border-cyan-500/40 transition-all flex items-center justify-between cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-cyan-600/20 text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-colors">
-                                <!-- Custom SVG Headset Icon -->
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
-                                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
-                                </svg>
-                            </span>
-                            <div>
-                                <div class="font-bold text-sm text-white">Hỗ Trợ</div>
-                                <div class="text-[11px] text-gray-400">Gửi báo cáo &amp; khiếu nại</div>
-                            </div>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-500 group-hover:text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
-
-                    <button type="button" onclick="navigateToScreen('lich-su')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-amber-950/40 border border-white/10 hover:border-amber-500/40 transition-all flex items-center justify-between cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors">
-                                <!-- Custom SVG Clock History Icon -->
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <polyline points="12 7 12 12 15 15"></polyline>
-                                </svg>
-                            </span>
-                            <div>
-                                <div class="font-bold text-sm text-white">Lịch Sử Đơn</div>
-                                <div class="text-[11px] text-gray-400">Đơn cày thuê đã đặt</div>
-                            </div>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-500 group-hover:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
-
-                    <button type="button" onclick="navigateToScreen('tai-khoan')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-purple-950/40 border border-white/10 hover:border-purple-500/40 transition-all flex items-center justify-between cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                                <!-- Custom SVG User Icon -->
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
- ection>
-                    <!-- Ủng Hộ -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
-                        <div>
-                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-heart text-red-400 animate-pulse"></i></div>
-                            <h3 class="font-serif text-lg font-bold text-yellow-300">Ủng Hộ Tác Giả</h3>
-                        </div>
-                        <div class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Cảm ơn các anh đẹp trai! ❤️</div>
-                        <button id="supportBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-red-950 font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Ủng Hộ Ngay</button>
-                    </section>
-                    <!-- Bảng Vàng -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
-                        <div>
-                            <div class="w-10 h-10 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-lg"><i class="fa-solid fa-trophy"></i></div>
-                            <h3 class="font-serif text-base font-bold text-yellow-300">Bảng Vàng</h3>
-                        </div>
-                        <div id="leaderboardList" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] max-h-28 overflow-y-auto space-y-1 text-left">
-                            <div class="text-center text-red-300/60">Đang tải bảng vàng...</div>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Chat Room -->
-                <section class="glass-card rounded-3xl p-4 border-2 border-yellow-400/60 flex flex-col justify-between shadow-2xl h-[400px] w-full">
-                    <div class="flex items-center justify-between pb-2 border-b border-yellow-500/30">
-                        <h3 class="font-serif text-sm font-bold text-yellow-300">Phòng Chat Chung</h3>
-                        <span class="text-[9px] text-emerald-400 font-semibold">● Online (Xoá sau 5 phút)</span>
-                    </div>
-                    <div id="chatMessagesBox" class="flex-grow my-2 overflow-y-auto space-y-2 pr-1 text-xs">
-                        <div class="text-center text-yellow-200/60 py-2">Đang tải tin nhắn...</div>
-                    </div>
-                    <form id="chatForm" class="flex items-center gap-2 pt-2 border-t border-yellow-500/20">
-                        <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." class="flex-grow px-3 py-2 rounded-xl bg-red-950/90 border border-yellow-500/40 text-yellow-100 text-xs focus:outline-none">
-                        <button type="submit" class="w-9 h-9 rounded-xl bg-yellow-500 text-red-950 font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-paper-plane text-xs"></i></button>
-                    </form>
-                </section>
+            <div class="truncate">
+              <div class="font-extrabold tracking-wide text-sm sm:text-base text-white leading-tight">
+                BLOX<span class="text-red-500">BOOST</span>
+              </div>
+              <div class="text-[11px] text-slate-400 truncate">Dịch Vụ Cày Thuê Blox Fruits</div>
             </div>
-        </main>
-    </div>
-
-    <!-- Modal Đăng Nhập / Đăng Ký -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden">
-        <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 relative shadow-2xl">
-            <button id="closeAuthModal" class="absolute top-3 right-3 text-yellow-400 w-7 h-7 rounded-full flex items-center justify-center border border-yellow-500/30 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            <div class="flex rounded-xl bg-red-950/90 p-1 border border-yellow-500/40 mb-4">
-                <button id="tabLogin" class="flex-1 py-2 rounded-lg text-xs font-bold text-yellow-300 bg-yellow-500/20 cursor-pointer">Đăng Nhập</button>
-                <button id="tabRegister" class="flex-1 py-2 rounded-lg text-xs font-bold text-red-200 cursor-pointer">Đăng Ký</button>
-            </div>
-            <!-- Form Đăng Nhập -->
-            <div id="formLogin" class="space-y-3">
-                <input type="email" id="loginEmail" placeholder="Email (abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
-                <input type="password" id="loginPass" placeholder="Mật khẩu..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
-                <button id="submitLogin" class="w-full py-3 bg-yellow-500 text-red-950 font-bold rounded-xl text-sm uppercase cursor-pointer">Đăng Nhập</button>
-            </div>
-            <!-- Form Đăng Ký -->
-            <div id="formRegister" class="space-y-3 hidden">
-                <input type="text" id="regName" placeholder="Tên hiển thị..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
-                <input type="email" id="regEmail" placeholder="Email hợp lệ (abc@gmail.com)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
-                <input type="password" id="regPass" placeholder="Mật khẩu (tối thiểu 6 ký tự)..." class="w-full px-3.5 py-2.5 rounded-xl bg-red-950/80 border border-yellow-500/40 text-yellow-100 text-sm">
-                <button id="submitRegister" class="w-full py-3 bg-red-600 text-yellow-300 font-bold rounded-xl text-sm uppercase cursor-pointer">Đăng Ký</button>
-            </div>
+          </button>
         </div>
-    </div>
 
-    <!-- Gọi file mã nguồn JavaScript xử lý -->
-    <script src="script.js"></script>
+        <!-- Thông tin tài khoản nhanh trên thanh đầu -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button
+            id="topAccountBtn"
+            type="button"
+            class="px-3.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-500/40 text-xs font-semibold text-red-100 flex items-center gap-2 transition cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21a8 8 0 0 0-16 0" />
+              <circle cx="12" cy="8" r="4" />
+            </svg>
+            <span id="headerAccountLabel">Đăng Nhập</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thanh chuyển mục ngang nhanh (tách biệt từng mục) -->
+      <div class="border-t border-red-900/40 bg-[#09050c]/90">
+        <div class="max-w-6xl mx-auto px-4 py-2 flex items-center gap-2 overflow-x-auto">
+          <button type="button" data-nav="cay-thue" class="nav-pill active px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Cày Thuê
+          </button>
+          <button type="button" data-nav="ho-tro" class="nav-pill px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Hỗ Trợ
+          </button>
+          <button type="button" data-nav="don-cua-toi" class="nav-pill px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Đơn Của Tôi
+          </button>
+          <button type="button" data-nav="tai-khoan" class="nav-pill px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Tài Khoản
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Lớp phủ & Ngăn kéo menu 3 gạch -->
+    <div id="drawerBackdrop" class="fixed inset-0 bg-black/75 backdrop-blur-xs"></div>
+    <aside id="sideDrawer" class="fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-[#100914] border-r border-red-500/40 p-5 flex flex-col justify-between shadow-2xl">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-red-900/50">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-400">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3z" />
+              </svg>
+            </div>
+            <div>
+              <div class="font-bold text-sm text-white">BLOXBOOST MENU</div>
+              <div id="drawerUserSub" class="text-[11px] text-slate-400">Chưa đăng nhập</div>
+            </div>
+          </div>
+          <button id="closeDrawerBtn" type="button" aria-label="Đóng menu" class="w-8 h-8 rounded-lg bg-red-950/70 border border-red-500/40 text-red-200 flex items-center justify-center cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="mt-5 space-y-2">
+          <button type="button" data-nav="cay-thue" class="nav-pill active w-full px-3.5 py-2.5 rounded-xl border border-red-500/30 text-left text-sm font-semibold text-slate-200 flex items-center gap-3 transition cursor-pointer">
+            <svg class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            <span>Cày Thuê</span>
+          </button>
+
+          <button type="button" data-nav="ho-tro" class="nav-pill w-full px-3.5 py-2.5 rounded-xl border border-red-500/30 text-left text-sm font-semibold text-slate-200 flex items-center gap-3 transition cursor-pointer">
+            <svg class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Hỗ Trợ</span>
+          </button>
+
+          <button type="button" data-nav="don-cua-toi" class="nav-pill w-full px-3.5 py-2.5 rounded-xl border border-red-500/30 text-left text-sm font-semibold text-slate-200 flex items-center gap-3 transition cursor-pointer">
+            <svg class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+              <rect x="9" y="3" width="6" height="4" rx="1" />
+              <path d="M9 12h6" />
+              <path d="M9 16h6" />
+            </svg>
+            <span>Đơn Của Tôi</span>
+          </button>
+
+          <button type="button" data-nav="tai-khoan" class="nav-pill w-full px-3.5 py-2.5 rounded-xl border border-red-500/30 text-left text-sm font-semibold text-slate-200 flex items-center gap-3 transition cursor-pointer">
+            <svg class="w-4 h-4 text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21a8 8 0 0 0-16 0" />
+              <circle cx="12" cy="8" r="4" />
+            </svg>
+            <span>Đăng Ký / Đăng Nhập</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="pt-4 border-t border-red-900/50 space-y-2">
+        <div id="syncBadge" class="text-[11px] px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/25 text-slate-300">
+          Đang kiểm tra kết nối dữ liệu...
+        </div>
+        <button
+          id="drawerLogoutBtn"
+          type="button"
+          class="hidden w-full py-2.5 rounded-xl bg-red-900/50 hover:bg-red-800/70 border border-red-500/40 text-xs font-bold text-red-200 transition cursor-pointer"
+        >
+          Đăng Xuất Tài Khoản
+        </button>
+      </div>
+    </aside>
+
+    <!-- Nội dung chính của từng mục tách rời -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+
+      <!-- MỤC 1: CÀY THUÊ (2 DỊCH VỤ: MAX LV 20.000Đ & THỨC TỈNH TRÁI FULL 15.000Đ) -->
+      <section id="view-cay-thue" class="shop-view space-y-8">
+        <div class="gothic-card rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div class="space-y-2 max-w-2xl">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/90 border border-red-500/40 text-xs font-semibold text-red-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              Hệ thống nhận đơn trực tuyến Blox Fruits
+            </span>
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Cày Thuê Nhanh - Chuẩn Xác - Minh Bạch
+            </h1>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Chuyên nhận <strong class="text-white">Cày Max Level</strong> và <strong class="text-white">Cày Thức Tỉnh Trái Full</strong>. Đơn hàng của bạn sẽ được lưu trực tiếp lên hệ thống để xử lý ngay.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-3 shrink-0">
+            <div class="rounded-2xl bg-red-950/60 border border-red-500/30 px-4 py-3 text-center">
+              <div class="text-lg font-extrabold text-red-400">20.000đ</div>
+              <div class="text-[11px] text-slate-300">Cày Max Level</div>
+            </div>
+            <div class="rounded-2xl bg-red-950/60 border border-red-500/30 px-4 py-3 text-center">
+              <div class="text-lg font-extrabold text-amber-400">15.000đ</div>
+              <div class="text-[11px] text-slate-300">Thức Tỉnh Trái</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danh sách 2 gói dịch vụ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Gói 1: Cày Max Level -->
+          <div class="gothic-card rounded-3xl p-6 flex flex-col justify-between gap-6">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
+                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
+                  </svg>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs uppercase tracking-wider text-slate-400">Gói Dịch Vụ</div>
+                  <div class="text-2xl font-extrabold text-red-400">20.000đ</div>
+                </div>
+              </div>
+
+              <div>
+                <h2 class="text-xl font-bold text-white">Cày Max Level</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                  Cày cấp độ lên mức tối đa hiện hành trong Blox Fruits, giữ nguyên tài sản và vật phẩm sẵn có trên tài khoản.
+                </p>
+              </div>
+
+              <ul class="space-y-2 text-xs text-slate-300 border-t border-red-900/40 pt-4">
+                <li class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Áp dụng mọi cấp độ hiện tại</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Cập nhật tiến độ đơn hàng rõ ràng</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              onclick="openOrderModal('Cày Max Level', 20000)"
+              class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm shadow-lg shadow-red-950/70 transition cursor-pointer"
+            >
+              Đặt Cày Max Level - 20.000đ
+            </button>
+          </div>
+
+          <!-- Gói 2: Cày Thức Tỉnh Trái Full -->
+          <div class="gothic-card rounded-3xl p-6 flex flex-col justify-between gap-6">
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
+                  <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2c2.5 3 4 5.2 4 8a4 4 0 1 1-8 0c0-2.8 1.5-5 4-8z" />
+                    <path d="M8.5 14.5A4.5 4.5 0 0 0 12 22a4.5 4.5 0 0 0 3.5-7.5" />
+                  </svg>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs uppercase tracking-wider text-slate-400">Gói Dịch Vụ</div>
+                  <div class="text-2xl font-extrabold text-amber-400">15.000đ</div>
+                </div>
+              </div>
+
+              <div>
+                <h2 class="text-xl font-bold text-white">Cày Thức Tỉnh Trái Full</h2>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                  Đi raid mở khóa đầy đủ chiêu thức thức tỉnh cho trái ác quỷ bạn chọn với mức giá đồng nhất 15.000đ.
+                </p>
+              </div>
+
+              <div class="space-y-1.5 border-t border-red-900/40 pt-4">
+                <label for="fruitQuickSelect" class="block text-xs font-semibold text-slate-300">
+                  Chọn trái muốn thức tỉnh:
+                </label>
+                <select
+                  id="fruitQuickSelect"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+                >
+                  <option value="Dough">Dough (Mochi)</option>
+                  <option value="Buddha">Buddha (Phật Tổ)</option>
+                  <option value="Magma">Magma (Nham Thạch)</option>
+                  <option value="Light">Light (Ánh Sáng)</option>
+                  <option value="Ice">Ice (Băng)</option>
+                  <option value="Flame">Flame (Lửa)</option>
+                  <option value="Dark">Dark (Bóng Tối)</option>
+                  <option value="Sand">Sand (Cát)</option>
+                  <option value="Quake">Quake (Chấn Động)</option>
+                  <option value="Spider">Spider (Nhện)</option>
+                  <option value="Phoenix">Phoenix (Phượng Hoàng)</option>
+                  <option value="Rumble">Rumble (Sấm Sét)</option>
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onclick="openFruitOrderFromCard()"
+              class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-950/60 transition cursor-pointer"
+            >
+              Đặt Thức Tỉnh Trái - 15.000đ
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MỤC 2: HỖ TRỢ (GỬI BÁO CÁO HỖ TRỢ THẬT LÊN HỆ THỐNG) -->
+      <section id="view-ho-tro" class="shop-view hidden space-y-6">
+        <div class="gothic-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-11 h-11 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white">Gửi Báo Cáo Hỗ Trợ</h2>
+              <p class="text-xs sm:text-sm text-slate-300">Gặp vấn đề về đơn cày thuê hoặc tài khoản, gửi báo cáo để Admin kiểm tra.</p>
+            </div>
+          </div>
+
+          <form id="supportReportForm" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="supportOrderCode" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Mã đơn hàng (nếu có)
+                </label>
+                <input
+                  id="supportOrderCode"
+                  type="text"
+                  placeholder="VD: DH-1024"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+              <div>
+                <label for="supportRobloxUser" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Tên tài khoản Roblox / Liên hệ
+                </label>
+                <input
+                  id="supportRobloxUser"
+                  type="text"
+                  placeholder="Tên tài khoản hoặc Zalo/FB"
+                  required
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="supportTopic" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Vấn đề cần hỗ trợ
+              </label>
+              <select
+                id="supportTopic"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              >
+                <option value="Kiểm tra tiến độ cày thuê">Kiểm tra tiến độ cày thuê</option>
+                <option value="Đổi mật khẩu / thông tin tài khoản">Đổi mật khẩu / thông tin tài khoản</option>
+                <option value="Khiếu nại / báo cáo sự cố đơn hàng">Khiếu nại / báo cáo sự cố đơn hàng</option>
+                <option value="Câu hỏi khác">Câu hỏi khác</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="supportMessage" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Nội dung chi tiết
+              </label>
+              <textarea
+                id="supportMessage"
+                rows="4"
+                required
+                placeholder="Mô tả rõ vấn đề bạn đang gặp phải..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm transition cursor-pointer"
+            >
+              Gửi Báo Cáo Hỗ Trợ
+            </button>
+          </form>
+
+          <div id="supportFeedback" class="mt-4 hidden px-4 py-3 rounded-xl text-xs font-semibold"></div>
+        </div>
+      </section>
+
+      <!-- MỤC 3: ĐƠN CỦA TÔI -->
+      <section id="view-don-cua-toi" class="shop-view hidden space-y-6">
+        <div class="gothic-card rounded-3xl p-6 sm:p-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white">Đơn Hàng Cày Thuê Của Bạn</h2>
+              <p class="text-xs sm:text-sm text-slate-300 mt-1">Theo dõi trạng thái xử lý các đơn đã đặt trên hệ thống.</p>
+            </div>
+            <button
+              type="button"
+              onclick="switchCustomerView('cay-thue')"
+              class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition cursor-pointer self-start"
+            >
+              + Đặt Thêm Đơn
+            </button>
+          </div>
+
+          <div id="myOrdersContainer" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- MỤC 4: TÀI KHOẢN (ĐĂNG KÝ / ĐĂNG NHẬP) -->
+      <section id="view-tai-khoan" class="shop-view hidden space-y-6">
+        <div id="loggedInProfileCard" class="gothic-card rounded-3xl p-6 sm:p-8 max-w-xl mx-auto hidden">
+          <div class="flex items-center justify-between gap-4 pb-4 border-b border-red-900/50">
+            <div>
+              <div class="text-xs uppercase tracking-wider text-red-400 font-semibold">Tài Khoản Đang Hoạt Động</div>
+              <h2 id="profileUsernameDisplay" class="text-2xl font-extrabold text-white mt-1">-</h2>
+              <p id="profileContactDisplay" class="text-xs text-slate-300 mt-0.5">-</p>
+            </div>
+            <button
+              id="profileLogoutBtn"
+              type="button"
+              class="px-4 py-2 rounded-xl bg-red-950 hover:bg-red-900 border border-red-500/40 text-xs font-bold text-red-200 transition cursor-pointer"
+            >
+              Đăng Xuất
+            </button>
+          </div>
+          <div class="mt-5 text-xs text-slate-300">
+            Khi đăng nhập, các đơn cày thuê bạn đặt sẽ gắn với tên tài khoản của bạn để dễ tra cứu.
+          </div>
+        </div>
+
+        <div id="authFormsCard" class="gothic-card rounded-3xl p-6 sm:p-8 max-w-xl mx-auto">
+          <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-[#09050d] border border-red-500/30 mb-6">
+            <button
+              id="switchLoginTab"
+              type="button"
+              class="py-2.5 rounded-xl text-xs font-bold bg-red-600 text-white transition cursor-pointer"
+            >
+              Đăng Nhập
+            </button>
+            <button
+              id="switchRegisterTab"
+              type="button"
+              class="py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer"
+            >
+              Đăng Ký Nick
+            </button>
+          </div>
+
+          <!-- Form Đăng Nhập -->
+          <form id="loginAccountForm" class="space-y-4">
+            <div>
+              <label for="loginUsernameInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Tên đăng nhập
+              </label>
+              <input
+                id="loginUsernameInput"
+                type="text"
+                required
+                placeholder="Nhập tên tài khoản..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <div>
+              <label for="loginPasswordInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Mật khẩu
+              </label>
+              <input
+                id="loginPasswordInput"
+                type="password"
+                required
+                placeholder="Nhập mật khẩu..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm transition cursor-pointer"
+            >
+              Đăng Nhập Ngay
+            </button>
+          </form>
+
+          <!-- Form Đăng Ký -->
+          <form id="registerAccountForm" class="space-y-4 hidden">
+            <div>
+              <label for="regUsernameInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Tên đăng nhập mới
+              </label>
+              <input
+                id="regUsernameInput"
+                type="text"
+                required
+                placeholder="Tối thiểu 3 ký tự..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <div>
+              <label for="regContactInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Liên hệ (Zalo / Facebook / Email)
+              </label>
+              <input
+                id="regContactInput"
+                type="text"
+                required
+                placeholder="Để shop liên hệ khi cần..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <div>
+              <label for="regPasswordInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Mật khẩu
+              </label>
+              <input
+                id="regPasswordInput"
+                type="password"
+                required
+                placeholder="Tối thiểu 4 ký tự..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+              />
+            </div>
+            <button
+              type="submit"
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm transition cursor-pointer"
+            >
+              Tạo Tài Khoản
+            </button>
+          </form>
+
+          <div id="authMessageBox" class="mt-4 hidden px-4 py-3 rounded-xl text-xs font-semibold"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==================== KHÔNG GIAN 2: TRANG QUẢN TRỊ ADMIN RIÊNG ==================== -->
+  <div id="adminWorkspaceShell" class="min-h-screen hidden flex-col bg-[#08050d]">
+    <header class="sticky top-0 z-40 rgb-border-top bg-[#100816]/95 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-400">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+          </div>
+          <div>
+            <div class="font-extrabold text-sm sm:text-base text-white">TRANG QUẢN TRỊ ADMIN</div>
+            <div class="text-[11px] text-red-300">Quản lý đơn đặt, doanh thu & báo cáo hỗ trợ</div>
+          </div>
+        </div>
+
+        <button
+          id="exitAdminBtn"
+          type="button"
+          class="px-4 py-2 rounded-xl bg-red-950/90 hover:bg-red-900 border border-red-500/50 text-xs font-bold text-red-100 flex items-center gap-2 transition cursor-pointer"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Về Shop Khách</span>
+        </button>
+      </div>
+
+      <div class="border-t border-red-900/40 bg-[#0b0610]">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 overflow-x-auto">
+          <button type="button" data-admin-tab="tong-quan" class="admin-tab active px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Tổng Quan & Doanh Thu
+          </button>
+          <button type="button" data-admin-tab="don-dat" class="admin-tab px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Đơn Đặt Cày Thuê
+          </button>
+          <button type="button" data-admin-tab="ho-tro" class="admin-tab px-3.5 py-1.5 rounded-lg border border-red-500/30 text-xs font-semibold text-slate-300 whitespace-nowrap transition cursor-pointer">
+            Báo Cáo Hỗ Trợ
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+      <!-- Tab Admin 1: Tổng quan & Doanh thu -->
+      <section id="admin-tab-tong-quan" class="admin-panel space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="gothic-card rounded-2xl p-5">
+            <div class="text-xs text-slate-400">Tổng Tiền Từ Đơn Hoàn Thành</div>
+            <div id="adminCompletedRevenue" class="text-2xl font-extrabold text-emerald-400 mt-1">0đ</div>
+          </div>
+          <div class="gothic-card rounded-2xl p-5">
+            <div class="text-xs text-slate-400">Tổng Giá Trị Tất Cả Đơn</div>
+            <div id="adminTotalOrderValue" class="text-2xl font-extrabold text-red-400 mt-1">0đ</div>
+          </div>
+          <div class="gothic-card rounded-2xl p-5">
+            <div class="text-xs text-slate-400">Số Đơn Đặt</div>
+            <div id="adminOrderCount" class="text-2xl font-extrabold text-white mt-1">0</div>
+          </div>
+          <div class="gothic-card rounded-2xl p-5">
+            <div class="text-xs text-slate-400">Báo Cáo Hỗ Trợ</div>
+            <div id="adminSupportCount" class="text-2xl font-extrabold text-amber-400 mt-1">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Admin 2: Danh sách đơn đặt -->
+      <section id="admin-tab-don-dat" class="admin-panel hidden space-y-4">
+        <div class="gothic-card rounded-3xl p-6">
+          <h2 class="text-lg font-bold text-white mb-4">Quản Lý Đơn Đặt Cày Thuê</h2>
+          <div id="adminOrdersList" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- Tab Admin 3: Báo cáo hỗ trợ từ khách -->
+      <section id="admin-tab-ho-tro" class="admin-panel hidden space-y-4">
+        <div class="gothic-card rounded-3xl p-6">
+          <h2 class="text-lg font-bold text-white mb-4">Báo Cáo Hỗ Trợ Từ Khách Hàng</h2>
+          <div id="adminSupportsList" class="space-y-3"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==================== MODAL ĐẶT DỊCH VỤ CÀY THUÊ ==================== -->
+  <div id="orderModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+    <div class="gothic-card rounded-3xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-red-900/50 pb-3">
+        <div>
+          <h3 id="orderModalTitle" class="text-lg font-bold text-white">Đặt Dịch Vụ</h3>
+          <p id="orderModalPriceText" class="text-xs font-semibold text-red-400 mt-0.5">0đ</p>
+        </div>
+        <button id="closeOrderModalBtn" type="button" class="w-8 h-8 rounded-lg bg-red-950/70 border border-red-500/40 text-red-200 flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="createOrderForm" class="space-y-3.5">
+        <input type="hidden" id="orderServiceName" />
+        <input type="hidden" id="orderServicePrice" />
+
+        <div id="orderFruitRow" class="hidden">
+          <label for="orderFruitName" class="block text-xs font-semibold text-slate-300 mb-1">
+            Trái muốn thức tỉnh full
+          </label>
+          <input
+            id="orderFruitName"
+            type="text"
+            readonly
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#09050d] border border-red-500/30 text-sm text-amber-300 font-semibold"
+          />
+        </div>
+
+        <div>
+          <label for="robloxAccountInput" class="block text-xs font-semibold text-slate-300 mb-1">
+            Tài khoản Roblox
+          </label>
+          <input
+            id="robloxAccountInput"
+            type="text"
+            required
+            placeholder="Nhập tên tài khoản Roblox..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+          />
+        </div>
+
+        <div>
+          <label for="robloxPasswordInput" class="block text-xs font-semibold text-slate-300 mb-1">
+            Mật khẩu Roblox
+          </label>
+          <input
+            id="robloxPasswordInput"
+            type="password"
+            required
+            placeholder="Nhập mật khẩu tài khoản..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+          />
+        </div>
+
+        <div>
+          <label for="orderNoteInput" class="block text-xs font-semibold text-slate-300 mb-1">
+            Ghi chú thêm (không bắt buộc)
+          </label>
+          <input
+            id="orderNoteInput"
+            type="text"
+            placeholder="VD: Đang ở Sea 2, cần cày nhanh..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm transition cursor-pointer"
+        >
+          Xác Nhận Đặt Đơn
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL XÁC THỰC MÃ PIN ADMIN ==================== -->
+  <div id="adminPinModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-xs">
+    <div class="gothic-card rounded-3xl max-w-sm w-full p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-red-900/50 pb-3">
+        <h3 class="text-base font-bold text-white">Xác Thực Quản Trị</h3>
+        <button id="closeAdminPinModalBtn" type="button" class="w-8 h-8 rounded-lg bg-red-950/70 border border-red-500/40 text-red-200 flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="adminPinForm" class="space-y-3.5">
+        <div>
+          <label for="adminPinInput" class="block text-xs font-semibold text-slate-300 mb-1.5">
+            Nhập mã PIN bảo mật
+          </label>
+          <input
+            id="adminPinInput"
+            type="password"
+            required
+            autocomplete="off"
+            placeholder="Nhập mã PIN..."
+            class="w-full px-3.5 py-2.5 rounded-xl bg-[#0b0710] border border-red-500/40 text-sm text-white focus:outline-none focus:border-red-400"
+          />
+        </div>
+        <p id="adminPinError" class="text-xs text-red-400 font-semibold hidden"></p>
+        <button
+          type="submit"
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-purple-700 hover:from-red-500 hover:to-purple-600 text-white font-bold text-sm transition cursor-pointer"
+        >
+          Mở Trang Quản Trị
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Cấu hình Firebase Cloud Firestore (thay bằng cấu hình dự án Firebase thật của bạn nếu dùng dự án riêng)
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDemoKeyForBloxBoostShop2026",
+      authDomain: "bloxboost-shop-2026.firebaseapp.com",
+      projectId: "bloxboost-shop-2026",
+      storageBucket: "bloxboost-shop-2026.appspot.com",
+      messagingSenderId: "102938475600",
+      appId: "1:102938475600:web:a1b2c3d4e5f60718293a4b"
+    };
+
+    const STORAGE_KEYS = {
+      orders: "bloxboost_live_orders_v1",
+      supports: "bloxboost_live_supports_v1",
+      accounts: "bloxboost_live_accounts_v1",
+      session: "bloxboost_live_session_v1"
+    };
+
+    const _k = ["d", "u", "n", "g", "h", "o", "e", "t"].join("");
+
+    let db = null;
+    let isCloudReady = false;
+    let ordersCache = readLocal(STORAGE_KEYS.orders, []);
+    let supportsCache = readLocal(STORAGE_KEYS.supports, []);
+    let accountsCache = readLocal(STORAGE_KEYS.accounts, []);
+    let currentUser = readLocal(STORAGE_KEYS.session, null);
+    let logoTapCount = 0;
+    let logoTapTimer = null;
+
+    function readLocal(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    function writeLocal(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (_) {}
+    }
+
+    function formatVnd(amount) {
+      return Number(amount || 0).toLocaleString("vi-VN") + "đ";
+    }
+
+    function formatTime(isoOrTs) {
+      const d = new Date(isoOrTs || Date.now());
+      if (Number.isNaN(d.getTime())) return "Vừa xong";
+      return d.toLocaleString("vi-VN");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function initCloudSync() {
+      const badge = document.getElementById("syncBadge");
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(FIREBASE_CONFIG);
+        }
+        db = firebase.firestore();
+        isCloudReady = true;
+
+        db.collection("bloxboost_orders")
+          .orderBy("createdAt", "desc")
+          .onSnapshot(
+            (snap) => {
+              const cloudOrders = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+              ordersCache = cloudOrders;
+              writeLocal(STORAGE_KEYS.orders, ordersCache);
+              renderMyOrders();
+              renderAdminData();
+            },
+            () => {
+              isCloudReady = false;
+              if (badge) badge.textContent = "Đang chạy bộ nhớ trình duyệt (Local)";
+            }
+          );
+
+        db.collection("bloxboost_supports")
+          .orderBy("createdAt", "desc")
+          .onSnapshot(
+            (snap) => {
+              const cloudSupports = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+              supportsCache = cloudSupports;
+              writeLocal(STORAGE_KEYS.supports, supportsCache);
+              renderAdminData();
+            },
+            () => {}
+          );
+
+        if (badge) badge.textContent = "Đã kết nối đồng bộ thời gian thực";
+      } catch (_) {
+        isCloudReady = false;
+        if (badge) badge.textContent = "Đang chạy bộ nhớ trình duyệt (Local)";
+      }
+    }
+
+    // Điều hướng ngăn kéo 3 gạch
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+    const drawerBackdrop = document.getElementById("drawerBackdrop");
+    const sideDrawer = document.getElementById("sideDrawer");
+
+    function openDrawer() {
+      sideDrawer.classList.add("open");
+      drawerBackdrop.classList.add("open");
+    }
+
+    function closeDrawer() {
+      sideDrawer.classList.remove("open");
+      drawerBackdrop.classList.remove("open");
+    }
+
+    hamburgerBtn.addEventListener("click", openDrawer);
+    closeDrawerBtn.addEventListener("click", closeDrawer);
+    drawerBackdrop.addEventListener("click", closeDrawer);
+
+    // Chuyển mục tách rời trong Shop Khách
+    function switchCustomerView(viewName) {
+      document.querySelectorAll(".shop-view").forEach((el) => el.classList.add("hidden"));
+      const target = document.getElementById("view-" + viewName);
+      if (target) target.classList.remove("hidden");
+
+      document.querySelectorAll(".nav-pill").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-nav") === viewName);
+      });
+
+      closeDrawer();
+      if (viewName === "don-cua-toi") renderMyOrders();
+      if (viewName === "tai-khoan") renderAccountView();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll(".nav-pill").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const viewName = btn.getAttribute("data-nav");
+        switchCustomerView(viewName);
+      });
+    });
+
+    document.getElementById("topAccountBtn").addEventListener("click", () => {
+      switchCustomerView("tai-khoan");
+    });
+
+    // Nút ẩn bấm 10 lần vào logo để mở trang Admin
+    const brandSecretTrigger = document.getElementById("brandSecretTrigger");
+    const adminPinModal = document.getElementById("adminPinModal");
+    const adminPinInput = document.getElementById("adminPinInput");
+    const adminPinError = document.getElementById("adminPinError");
+
+    brandSecretTrigger.addEventListener("click", () => {
+      logoTapCount += 1;
+      clearTimeout(logoTapTimer);
+      logoTapTimer = setTimeout(() => {
+        logoTapCount = 0;
+      }, 2500);
+
+      if (logoTapCount >= 10) {
+        logoTapCount = 0;
+        clearTimeout(logoTapTimer);
+        adminPinError.classList.add("hidden");
+        adminPinInput.value = "";
+        adminPinModal.classList.remove("hidden");
+        adminPinModal.classList.add("flex");
+        setTimeout(() => adminPinInput.focus(), 50);
+      }
+    });
+
+    document.getElementById("closeAdminPinModalBtn").addEventListener("click", () => {
+      adminPinModal.classList.add("hidden");
+      adminPinModal.classList.remove("flex");
+    });
+
+    document.getElementById("adminPinForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entered = adminPinInput.value.trim();
+      if (entered === _k) {
+        adminPinModal.classList.add("hidden");
+        adminPinModal.classList.remove("flex");
+        openAdminWorkspace();
+      } else {
+        adminPinError.textContent = "Mã PIN không chính xác.";
+        adminPinError.classList.remove("hidden");
+      }
+    });
+
+    // Chuyển giữa Shop Khách và Trang Quản Trị Admin
+    const customerShell = document.getElementById("customerWorkspaceShell");
+    const adminShell = document.getElementById("adminWorkspaceShell");
+
+    function openAdminWorkspace() {
+      closeDrawer();
+      customerShell.classList.add("hidden");
+      adminShell.classList.remove("hidden");
+      adminShell.classList.add("flex");
+      switchAdminTab("tong-quan");
+      renderAdminData();
+    }
+
+    function exitAdminWorkspace() {
+      adminShell.classList.add("hidden");
+      adminShell.classList.remove("flex");
+      customerShell.classList.remove("hidden");
+    }
+
+    document.getElementById("exitAdminBtn").addEventListener("click", exitAdminWorkspace);
+
+    function switchAdminTab(tabName) {
+      document.querySelectorAll(".admin-panel").forEach((el) => el.classList.add("hidden"));
+      const panel = document.getElementById("admin-tab-" + tabName);
+      if (panel) panel.classList.remove("hidden");
+
+      document.querySelectorAll(".admin-tab").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-admin-tab") === tabName);
+      });
+    }
+
+    document.querySelectorAll(".admin-tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        switchAdminTab(btn.getAttribute("data-admin-tab"));
+      });
+    });
+
+    // Đặt đơn cày thuê
+    const orderModal = document.getElementById("orderModal");
+    const orderModalTitle = document.getElementById("orderModalTitle");
+    const orderModalPriceText = document.getElementById("orderModalPriceText");
+    const orderServiceName = document.getElementById("orderServiceName");
+    const orderServicePrice = document.getElementById("orderServicePrice");
+    const orderFruitRow = document.getElementById("orderFruitRow");
+    const orderFruitName = document.getElementById("orderFruitName");
+
+    function openOrderModal(serviceName, price, fruitName = "") {
+      orderServiceName.value = serviceName;
+      orderServicePrice.value = String(price);
+      orderModalTitle.textContent = serviceName;
+      orderModalPriceText.textContent = formatVnd(price) + (fruitName ? " • Trái: " + fruitName : "");
+
+      if (fruitName) {
+        orderFruitRow.classList.remove("hidden");
+        orderFruitName.value = fruitName;
+      } else {
+        orderFruitRow.classList.add("hidden");
+        orderFruitName.value = "";
+      }
+
+      orderModal.classList.remove("hidden");
+      orderModal.classList.add("flex");
+    }
+
+    function openFruitOrderFromCard() {
+      const fruit = document.getElementById("fruitQuickSelect").value;
+      openOrderModal("Cày Thức Tỉnh Trái Full", 15000, fruit);
+    }
+
+    document.getElementById("closeOrderModalBtn").addEventListener("click", () => {
+      orderModal.classList.add("hidden");
+      orderModal.classList.remove("flex");
+    });
+
+    document.getElementById("createOrderForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const service = orderServiceName.value;
+      const price = Number(orderServicePrice.value || 0);
+      const fruit = orderFruitName.value.trim();
+      const robloxAccount = document.getElementById("robloxAccountInput").value.trim();
+      const robloxPassword = document.getElementById("robloxPasswordInput").value;
+      const note = document.getElementById("orderNoteInput").value.trim();
+
+      if (!robloxAccount || !robloxPassword) return;
+
+      const orderCode = "DH-" + Math.floor(1000 + Math.random() * 9000);
+      const newOrder = {
+        id: "ord_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        orderCode,
+        customerUsername: currentUser ? currentUser.username : "Khách chưa đăng nhập",
+        service,
+        fruit: fruit || null,
+        price,
+        robloxAccount,
+        robloxPassword,
+        note,
+        status: "Chờ xử lý",
+        createdAt: Date.now()
+      };
+
+      ordersCache.unshift(newOrder);
+      writeLocal(STORAGE_KEYS.orders, ordersCache);
+
+      if (isCloudReady && db) {
+        try {
+          await db.collection("bloxboost_orders").doc(newOrder.id).set(newOrder);
+        } catch (_) {}
+      }
+
+      document.getElementById("createOrderForm").reset();
+      orderModal.classList.add("hidden");
+      orderModal.classList.remove("flex");
+
+      renderMyOrders();
+      renderAdminData();
+      switchCustomerView("don-cua-toi");
+      alert("Đã gửi đơn " + orderCode + " thành công!");
+    });
+
+    // Gửi báo cáo hỗ trợ
+    document.getElementById("supportReportForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const orderCode = document.getElementById("supportOrderCode").value.trim();
+      const contact = document.getElementById("supportRobloxUser").value.trim();
+      const topic = document.getElementById("supportTopic").value;
+      const message = document.getElementById("supportMessage").value.trim();
+      const feedback = document.getElementById("supportFeedback");
+
+      if (!contact || !message) return;
+
+      const report = {
+        id: "sup_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        username: currentUser ? currentUser.username : "Khách",
+        orderCode: orderCode || "Không có",
+        contact,
+        topic,
+        message,
+        status: "Chưa phản hồi",
+        createdAt: Date.now()
+      };
+
+      supportsCache.unshift(report);
+      writeLocal(STORAGE_KEYS.supports, supportsCache);
+
+      if (isCloudReady && db) {
+        try {
+          await db.collection("bloxboost_supports").doc(report.id).set(report);
+        } catch (_) {}
+      }
+
+      e.target.reset();
+      feedback.className = "mt-4 px-4 py-3 rounded-xl text-xs font-semibold bg-emerald-950/70 border border-emerald-500/40 text-emerald-300";
+      feedback.textContent = "Đã gửi báo cáo hỗ trợ lên hệ thống.";
+      feedback.classList.remove("hidden");
+      renderAdminData();
+    });
+
+    // Đăng ký & Đăng nhập tài khoản
+    const switchLoginTab = document.getElementById("switchLoginTab");
+    const switchRegisterTab = document.getElementById("switchRegisterTab");
+    const loginAccountForm = document.getElementById("loginAccountForm");
+    const registerAccountForm = document.getElementById("registerAccountForm");
+    const authMessageBox = document.getElementById("authMessageBox");
+
+    switchLoginTab.addEventListener("click", () => {
+      switchLoginTab.className = "py-2.5 rounded-xl text-xs font-bold bg-red-600 text-white transition cursor-pointer";
+      switchRegisterTab.className = "py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer";
+      loginAccountForm.classList.remove("hidden");
+      registerAccountForm.classList.add("hidden");
+      authMessageBox.classList.add("hidden");
+    });
+
+    switchRegisterTab.addEventListener("click", () => {
+      switchRegisterTab.className = "py-2.5 rounded-xl text-xs font-bold bg-red-600 text-white transition cursor-pointer";
+      switchLoginTab.className = "py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer";
+      registerAccountForm.classList.remove("hidden");
+      loginAccountForm.classList.add("hidden");
+      authMessageBox.classList.add("hidden");
+    });
+
+    registerAccountForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("regUsernameInput").value.trim();
+      const contact = document.getElementById("regContactInput").value.trim();
+      const password = document.getElementById("regPasswordInput").value;
+
+      if (username.length < 3 || password.length < 4) {
+        authMessageBox.className = "mt-4 px-4 py-3 rounded-xl text-xs font-semibold bg-red-950/70 border border-red-500/40 text-red-300";
+        authMessageBox.textContent = "Tên đăng nhập tối thiểu 3 ký tự và mật khẩu tối thiểu 4 ký tự.";
+        authMessageBox.classList.remove("hidden");
+        return;
+      }
+
+      const exists = accountsCache.some((u) => u.username.toLowerCase() === username.toLowerCase());
+      if (exists) {
+        authMessageBox.className = "mt-4 px-4 py-3 rounded-xl text-xs font-semibold bg-red-950/70 border border-red-500/40 text-red-300";
+        authMessageBox.textContent = "Tên đăng nhập này đã tồn tại.";
+        authMessageBox.classList.remove("hidden");
+        return;
+      }
+
+      const account = { username, contact, password, createdAt: Date.now() };
+      accountsCache.push(account);
+      writeLocal(STORAGE_KEYS.accounts, accountsCache);
+
+      currentUser = { username, contact };
+      writeLocal(STORAGE_KEYS.session, currentUser);
+      updateAccountUI();
+      renderAccountView();
+      renderMyOrders();
+
+      registerAccountForm.reset();
+      authMessageBox.className = "mt-4 px-4 py-3 rounded-xl text-xs font-semibold bg-emerald-950/70 border border-emerald-500/40 text-emerald-300";
+      authMessageBox.textContent = "Đăng ký và đăng nhập thành công!";
+      authMessageBox.classList.remove("hidden");
+    });
+
+    loginAccountForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("loginUsernameInput").value.trim();
+      const password = document.getElementById("loginPasswordInput").value;
+
+      const found = accountsCache.find(
+        (u) => u.username.toLowerCase() === username.toLowerCase() && u.password === password
+      );
+
+      if (!found) {
+        authMessageBox.className = "mt-4 px-4 py-3 rounded-xl text-xs font-semibold bg-red-950/70 border border-red-500/40 text-red-300";
+        authMessageBox.textContent = "Sai tên đăng nhập hoặc mật khẩu.";
+        authMessageBox.classList.remove("hidden");
+        return;
+      }
+
+      currentUser = { username: found.username, contact: found.contact };
+      writeLocal(STORAGE_KEYS.session, currentUser);
+      updateAccountUI();
+      renderAccountView();
+      renderMyOrders();
+      loginAccountForm.reset();
+    });
+
+    function logoutAccount() {
+      currentUser = null;
+      writeLocal(STORAGE_KEYS.session, null);
+      updateAccountUI();
+      renderAccountView();
+      renderMyOrders();
+    }
+
+    document.getElementById("drawerLogoutBtn").addEventListener("click", () => {
+      logoutAccount();
+      closeDrawer();
+    });
+    document.getElementById("profileLogoutBtn").addEventListener("click", logoutAccount);
+
+    function updateAccountUI() {
+      const label = document.getElementById("headerAccountLabel");
+      const sub = document.getElementById("drawerUserSub");
+      const drawerLogout = document.getElementById("drawerLogoutBtn");
+
+      if (currentUser) {
+        label.textContent = currentUser.username;
+        sub.textContent = "Tài khoản: " + currentUser.username;
+        drawerLogout.classList.remove("hidden");
+      } else {
+        label.textContent = "Đăng Nhập";
+        sub.textContent = "Chưa đăng nhập";
+        drawerLogout.classList.add("hidden");
+      }
+    }
+
+    function renderAccountView() {
+      const loggedCard = document.getElementById("loggedInProfileCard");
+      const authCard = document.getElementById("authFormsCard");
+
+      if (currentUser) {
+        loggedCard.classList.remove("hidden");
+        authCard.classList.add("hidden");
+        document.getElementById("profileUsernameDisplay").textContent = currentUser.username;
+        document.getElementById("profileContactDisplay").textContent = "Liên hệ: " + (currentUser.contact || "Chưa cập nhật");
+      } else {
+        loggedCard.classList.add("hidden");
+        authCard.classList.remove("hidden");
+      }
+    }
+
+    function renderMyOrders() {
+      const container = document.getElementById("myOrdersContainer");
+      const list = currentUser
+        ? ordersCache.filter((o) => o.customerUsername === currentUser.username)
+        : ordersCache;
+
+      if (!list.length) {
+        container.innerHTML = `<div class="rounded-2xl bg-[#0b0710] border border-red-900/40 p-6 text-center text-xs text-slate-400">Chưa có đơn hàng cày thuê nào.</div>`;
+        return;
+      }
+
+      container.innerHTML = list
+        .map(
+          (o) => `
+        <div class="rounded-2xl bg-[#0b0710] border border-red-500/30 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold text-red-400">${escapeHtml(o.orderCode)}</span>
+              <span class="text-sm font-bold text-white">${escapeHtml(o.service)}</span>
+              ${o.fruit ? `<span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">Trái: ${escapeHtml(o.fruit)}</span>` : ""}
+            </div>
+            <div class="text-xs text-slate-300">Tài khoản Roblox: <strong class="text-white">${escapeHtml(o.robloxAccount)}</strong> • ${formatTime(o.createdAt)}</div>
+            ${o.note ? `<div class="text-xs text-slate-400">Ghi chú: ${escapeHtml(o.note)}</div>` : ""}
+          </div>
+          <div class="sm:text-right shrink-0">
+            <div class="text-sm font-extrabold text-white">${formatVnd(o.price)}</div>
+            <div class="text-xs font-semibold text-amber-300 mt-0.5">${escapeHtml(o.status)}</div>
+          </div>
+        </div>
+      `
+        )
+        .join("");
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      const idx = ordersCache.findIndex((o) => o.id === orderId);
+      if (idx !== -1) {
+        ordersCache[idx].status = newStatus;
+        writeLocal(STORAGE_KEYS.orders, ordersCache);
+      }
+      if (isCloudReady && db) {
+        try {
+          await db.collection("bloxboost_orders").doc(orderId).update({ status: newStatus });
+        } catch (_) {}
+      }
+      renderAdminData();
+      renderMyOrders();
+    }
+
+    async function updateSupportStatus(reportId, newStatus) {
+      const idx = supportsCache.findIndex((s) => s.id === reportId);
+      if (idx !== -1) {
+        supportsCache[idx].status = newStatus;
+        writeLocal(STORAGE_KEYS.supports, supportsCache);
+      }
+      if (isCloudReady && db) {
+        try {
+          await db.collection("bloxboost_supports").doc(reportId).update({ status: newStatus });
+        } catch (_) {}
+      }
+      renderAdminData();
+    }
+
+    function renderAdminData() {
+      const completedSum = ordersCache
+        .filter((o) => o.status === "Hoàn thành")
+        .reduce((acc, o) => acc + Number(o.price || 0), 0);
+      const totalOrderSum = ordersCache.reduce((acc, o) => acc + Number(o.price || 0), 0);
+
+      document.getElementById("adminCompletedRevenue").textContent = formatVnd(completedSum);
+      document.getElementById("adminTotalOrderValue").textContent = formatVnd(totalOrderSum);
+      document.getElementById("adminOrderCount").textContent = String(ordersCache.length);
+      document.getElementById("adminSupportCount").textContent = String(supportsCache.length);
+
+      const ordersBox = document.getElementById("adminOrdersList");
+      if (!ordersCache.length) {
+        ordersBox.innerHTML = `<div class="rounded-2xl bg-[#0b0710] border border-red-900/40 p-6 text-center text-xs text-slate-400">Chưa có đơn đặt nào.</div>`;
+      } else {
+        ordersBox.innerHTML = ordersCache
+          .map(
+            (o) => `
+          <div class="rounded-2xl bg-[#0b0710] border border-red-500/30 p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="space-y-1 text-xs">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-red-400">${escapeHtml(o.orderCode)}</span>
+                <span class="text-sm font-bold text-white">${escapeHtml(o.service)}</span>
+                ${o.fruit ? `<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300">Trái: ${escapeHtml(o.fruit)}</span>` : ""}
+                <span class="font-bold text-emerald-400">${formatVnd(o.price)}</span>
+              </div>
+              <div class="text-slate-300">Khách: <strong>${escapeHtml(o.customerUsername)}</strong> • ${formatTime(o.createdAt)}</div>
+              <div class="text-slate-300">Roblox: <strong class="text-white">${escapeHtml(o.robloxAccount)}</strong> / Mật khẩu: <strong class="text-amber-200">${escapeHtml(o.robloxPassword)}</strong></div>
+              ${o.note ? `<div class="text-slate-400">Ghi chú: ${escapeHtml(o.note)}</div>` : ""}
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <select
+                onchange="updateOrderStatus('${escapeHtml(o.id)}', this.value)"
+                class="px-3 py-2 rounded-xl bg-[#140c1c] border border-red-500/40 text-xs font-semibold text-white focus:outline-none"
+              >
+                <option value="Chờ xử lý" ${o.status === "Chờ xử lý" ? "selected" : ""}>Chờ xử lý</option>
+                <option value="Đang cày" ${o.status === "Đang cày" ? "selected" : ""}>Đang cày</option>
+                <option value="Hoàn thành" ${o.status === "Hoàn thành" ? "selected" : ""}>Hoàn thành</option>
+                <option value="Đã hủy" ${o.status === "Đã hủy" ? "selected" : ""}>Đã hủy</option>
+              </select>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+
+      const supportsBox = document.getElementById("adminSupportsList");
+      if (!supportsCache.length) {
+        supportsBox.innerHTML = `<div class="rounded-2xl bg-[#0b0710] border border-red-900/40 p-6 text-center text-xs text-slate-400">Chưa có báo cáo hỗ trợ nào.</div>`;
+      } else {
+        supportsBox.innerHTML = supportsCache
+          .map(
+            (s) => `
+          <div class="rounded-2xl bg-[#0b0710] border border-red-500/30 p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="space-y-1 text-xs">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-sm font-bold text-white">${escapeHtml(s.topic)}</span>
+                <span class="text-red-300 font-semibold">Mã đơn: ${escapeHtml(s.orderCode)}</span>
+              </div>
+              <div class="text-slate-300">Liên hệ: <strong>${escapeHtml(s.contact)}</strong> • Tài khoản: ${escapeHtml(s.username)} • ${formatTime(s.createdAt)}</div>
+              <div class="text-slate-200 bg-[#120a18] border border-red-900/40 rounded-xl p-2.5 mt-1">${escapeHtml(s.message)}</div>
+            </div>
+
+            <div class="shrink-0">
+              <select
+                onchange="updateSupportStatus('${escapeHtml(s.id)}', this.value)"
+                class="px-3 py-2 rounded-xl bg-[#140c1c] border border-red-500/40 text-xs font-semibold text-white focus:outline-none"
+              >
+                <option value="Chưa phản hồi" ${s.status === "Chưa phản hồi" ? "selected" : ""}>Chưa phản hồi</option>
+                <option value="Đã xử lý" ${s.status === "Đã xử lý" ? "selected" : ""}>Đã xử lý</option>
+              </select>
+            </div>
+          </div>
+        `
+          )
+          .join("");
+      }
+    }
+
+    // Khởi tạo ứng dụng
+    updateAccountUI();
+    renderAccountView();
+    renderMyOrders();
+    renderAdminData();
+    initCloudSync();
+  </script>
 </body>
 </html>
