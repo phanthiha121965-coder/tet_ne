@@ -1,120 +1,420 @@
+```html
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chào Xuân Đinh Mùi 2027 - Mừng Tết Nguyên Đán</title>
-    <!-- Tailwind CSS CDN -->
+    <title>BLOXBOOST - Shop Cày Thuê Blox Fruits Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- THÊM THƯ VIỆN FIREBASE CLOUD DATABASE VÀO ĐÂY -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Firebase Firestore Compat SDK (Cloud Online Persistence) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
-    <!-- Gọi file CSS riêng -->
-    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        gaming: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        cosmic: {
+                            950: '#05050a',
+                            900: '#0b0b14',
+                            800: '#131320',
+                            700: '#1c1c2e',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        /* Dark Cosmic + Gothic Red/Black + Subtle RGB Neon */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #05050a;
+            background-image:
+                radial-gradient(circle at 14% 12%, rgba(220, 38, 38, 0.2) 0%, transparent 42%),
+                radial-gradient(circle at 86% 18%, rgba(139, 92, 246, 0.16) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(239, 68, 68, 0.12) 0%, transparent 48%);
+            background-attachment: fixed;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(16, 16, 28, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes rgbNeonPulse {
+            0% {
+                border-color: rgba(239, 68, 68, 0.45);
+                box-shadow: 0 0 18px rgba(239, 68, 68, 0.22), inset 0 0 12px rgba(239, 68, 68, 0.06);
+            }
+            33% {
+                border-color: rgba(168, 85, 247, 0.45);
+                box-shadow: 0 0 18px rgba(168, 85, 247, 0.22), inset 0 0 12px rgba(168, 85, 247, 0.06);
+            }
+            66% {
+                border-color: rgba(34, 211, 238, 0.42);
+                box-shadow: 0 0 18px rgba(34, 211, 238, 0.18), inset 0 0 12px rgba(34, 211, 238, 0.06);
+            }
+            100% {
+                border-color: rgba(239, 68, 68, 0.45);
+                box-shadow: 0 0 18px rgba(239, 68, 68, 0.22), inset 0 0 12px rgba(239, 68, 68, 0.06);
+            }
+        }
+
+        .rgb-border {
+            animation: rgbNeonPulse 7s linear infinite;
+        }
+
+        .rgb-top-strip {
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(90deg, #ef4444, #a855f7, #06b6d4, #ef4444);
+            background-size: 300% 100%;
+            animation: rgbStripFlow 6s linear infinite;
+        }
+
+        @keyframes rgbStripFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        /* Fixed Top Header & Guaranteed 3-Line Hamburger Button (#hamburgerBtn) */
+        .top-header-bar {
+            position: sticky;
+            top: 0;
+            z-index: 55;
+            width: 100%;
+            background: rgba(11, 11, 20, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.28);
+        }
+
+        #hamburgerBtn {
+            position: relative;
+            z-index: 60;
+            min-width: 44px;
+            min-height: 44px;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            pointer-events: auto;
+            touch-action: manipulation;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #fca5a5;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        #hamburgerBtn:hover,
+        #hamburgerBtn:focus-visible {
+            background: rgba(239, 68, 68, 0.28);
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Drawer Backdrop (#drawerBackdrop): Strictly Hidden by Default */
+        #drawerBackdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+
+        #drawerBackdrop.open {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Side Drawer (#sideDrawer) */
+        #sideDrawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 315px;
+            max-width: 85vw;
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            pointer-events: auto;
+            background: rgba(12, 12, 22, 0.98);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-right: 1px solid rgba(239, 68, 68, 0.35);
+            box-shadow: 12px 0 38px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #sideDrawer.open {
+            transform: translateX(0);
+        }
+
+        /* Modal Overlays */
+        .overlay-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 125;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            pointer-events: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .overlay-modal.open {
+            display: flex;
+            pointer-events: auto;
+        }
+
+        /* Separated Screens: Only One Active at a Time */
+        .screen-view {
+            display: none;
+        }
+
+        .screen-view.active {
+            display: block;
+        }
+
+        /* Standalone Customer vs Admin Workspace Shell */
+        #customerWorkspaceShell.workspace-hidden,
+        #adminWorkspaceShell.workspace-hidden {
+            display: none !important;
+        }
+
+        .admin-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 65;
+            width: 100%;
+            background: rgba(14, 7, 14, 0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0b14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #282840;
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444;
+        }
+    </style>
 </head>
-<body class="min-h-screen relative flex flex-col justify-between selection:bg-yellow-500 selection:text-red-950">
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
-    <canvas id="fireworksCanvas"></canvas>
+    <!-- Top RGB Neon Strip -->
+    <div class="rgb-top-strip"></div>
 
-    <div id="homeSection" class="w-full flex flex-col min-h-screen justify-between relative z-20">
-        <!-- POPUP THÔNG BÁO -->
-        <div id="customModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-            <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
-                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
-                    <i id="modalIcon" class="fa-solid fa-bell text-yellow-300"></i>
+    <!-- =====================================================================
+         A. STANDALONE CUSTOMER SHOP WORKSPACE (#customerWorkspaceShell)
+         ===================================================================== -->
+    <div id="customerWorkspaceShell" class="flex-grow flex flex-col">
+
+        <!-- 1. FIXED / STICKY TOP HEADER BAR (CUSTOMER) -->
+        <header class="top-header-bar">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-20 gap-2">
+
+                    <!-- Left Cluster: 3-Line Hamburger Button (#hamburgerBtn) + Secret 10-Tap Logo (#brandSecretTrigger) -->
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <button
+                            id="hamburgerBtn"
+                            type="button"
+                            aria-label="Mở hoặc đóng menu điều hướng"
+                            aria-controls="sideDrawer"
+                            aria-expanded="false"
+                        >
+                            <!-- Custom SVG 3-Line Hamburger Icon -->
+                            <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+
+                        <!-- Brand Emblem + BLOXBOOST (10 Taps in 1.8s -> Secret PIN Modal) -->
+                        <div
+                            id="brandSecretTrigger"
+                            role="button"
+                            tabindex="0"
+                            aria-label="Logo BLOXBOOST"
+                            class="flex items-center gap-2 min-w-0 cursor-pointer select-none"
+                        >
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 via-red-800 to-purple-900 border border-red-400/40 flex items-center justify-center shrink-0 shadow-md shadow-red-950/60 pointer-events-none">
+                                <!-- Custom SVG Gothic Crescent Blade Logo -->
+                                <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 19 8.5 15.5 21 8.5 21 5 8.5 12 2"></polygon>
+                                    <line x1="12" y1="2" x2="12" y2="21"></line>
+                                    <circle cx="12" cy="11.5" r="2.2" fill="currentColor"></circle>
+                                </svg>
+                            </div>
+                            <div class="min-w-0 pointer-events-none">
+                                <div class="font-gaming font-extrabold text-lg sm:text-2xl tracking-wider text-white leading-none truncate">
+                                    BLOX<span class="text-red-500">BOOST</span>
+                                </div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold hidden sm:block">
+                                    Blox Fruits Real Orders
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Cluster: Cloud Sync Status + Account & Order History Controls -->
+                    <div id="headerRightActions" class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <!-- Rendered dynamically via JS -->
+                    </div>
                 </div>
-                <h3 id="modalTitle" class="font-serif text-xl font-bold text-yellow-300 mb-2">Thông Báo</h3>
-                <p id="modalMessage" class="text-xs text-red-100 mb-5 leading-relaxed">Nội dung...</p>
-                <button id="modalCloseBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">Đã Hiểu</button>
             </div>
-        </div>
-
-        <!-- POPUP NĂN NỈ CUTE (Link4M) -->
-        <div id="cutePopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
-            <div class="glass-card max-w-sm w-full rounded-3xl p-6 border-2 border-yellow-400 text-center relative shadow-2xl animate-pulse-glow">
-                <div class="w-16 h-16 mx-auto mb-3 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-400/50 text-yellow-300 text-2xl">
-                    <i class="fa-solid fa-face-pleading text-yellow-300 animate-bounce"></i>
-                </div>
-                <h3 class="font-serif text-xl font-bold text-yellow-300 mb-2">Gửi Các Anh Đẹp Trai!</h3>
-                <p class="text-xs text-red-200 mb-5 leading-relaxed">
-                    Các anh đẹp trai có thể bấm ủng hộ em <span class="text-yellow-300 font-bold">1 lần thui</span> được không ạ? Đi mà, giúp em đi mà... 🥺🙏
-                </p>
-                <div class="space-y-2">
-                    <button id="popupAcceptBtn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-red-950 font-bold rounded-xl text-xs uppercase shadow-lg border border-yellow-200 cursor-pointer">
-                        <i class="fa-solid fa-heart mr-1"></i> Bấm Ủng Hộ Ngay (Link4M)
-                    </button>
-                    <button id="popupCloseBtn" class="w-full py-2.5 bg-red-950/80 text-red-300 hover:text-white font-semibold rounded-xl text-xs border border-red-500/30 transition cursor-pointer">
-                        Thôi để sau (Đóng)
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Thanh điều hướng góc phải -->
-        <div class="fixed top-4 right-4 z-50 flex items-center gap-3">
-            <div id="authStatusContainer" class="relative">
-                <button id="openAuthModalBtn" style="background-color: rgba(88, 10, 10, 0.95); border: 2px solid #fbbf24; color: #fde68a;" class="px-4 h-12 rounded-full flex items-center gap-2 shadow-2xl text-xs sm:text-sm font-bold active:scale-95 cursor-pointer">
-                    <i class="fa-solid fa-user-circle text-lg"></i>
-                    <span id="userDisplayName">Đăng Nhập</span>
-                </button>
-                <div id="userDropdownMenu" class="absolute right-0 mt-2 w-48 glass-card rounded-2xl p-2 border border-yellow-500/50 shadow-2xl hidden z-50">
-                    <button id="logoutBtn" class="w-full text-left px-3 py-2 rounded-xl text-red-200 hover:bg-red-800/60 hover:text-yellow-300 text-xs font-bold transition flex items-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất
-                    </button>
-                </div>
-            </div>
-            <button id="fireworksToggleBtn" title="Bắn pháo hoa" class="glass-card text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center border border-yellow-500/50 cursor-pointer"><i class="fa-solid fa-burst text-xl"></i></button>
-            <button id="musicToggleBtn" title="Nhạc Tết" class="glass-card text-yellow-300 w-12 h-12 rounded-full flex items-center justify-center border border-yellow-500/50 cursor-pointer"><i id="musicIcon" class="fa-solid fa-music text-lg"></i></button>
-        </div>
-
-        <iframe id="ytMusicPlayer" style="display:none;" width="0" height="0" src="https://www.youtube.com/embed/V0mpjcAjL4o?enablejsapi=1&autoplay=1&loop=1&playlist=V0mpjcAjL4o" allow="autoplay"></iframe>
-
-        <!-- PHẦN HEADER ĐƯỢC TỐI ƯU CO GIÃN TOÀN MÀN HÌNH -->
-        <header class="pt-16 pb-6 text-center px-4 w-full max-w-7xl mx-auto">
-            <h1 class="font-cursive text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-yellow-400 gold-text-glow font-bold mb-3">Chúc Mừng Năm Mới</h1>
-            <p class="font-serif italic text-base sm:text-xl md:text-2xl text-red-200 opacity-90 px-2">"Xuân an khang đức tài như ý – Niên thịnh vượng phúc thọ vô biên"</p>
         </header>
 
-        <!-- PHẦN MAIN CONTAINER ĐƯỢC TỐI ƯU CÂN ĐỐI TRÊN PC VÀ MOBILE -->
-        <main class="container mx-auto px-4 py-4 flex-grow flex flex-col items-center justify-center gap-8 w-full max-w-7xl">
-            <!-- Countdown -->
-            <section class="w-full max-w-4xl glass-card rounded-3xl p-6 text-center border-2 border-yellow-500/50 shadow-2xl">
-                <h2 class="text-xs sm:text-sm font-semibold uppercase tracking-widest text-yellow-400 mb-4"><i class="fa-solid fa-hourglass-start"></i> Đếm ngược Giao Thừa Đinh Mùi 2027</h2>
-                <div class="grid grid-cols-4 gap-3 sm:gap-4">
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="days" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Ngày</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="hours" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Giờ</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="minutes" class="font-bold text-2xl sm:text-3xl text-yellow-300">00</span><p class="text-[10px] uppercase">Phút</p></div>
-                    <div class="bg-red-950/70 p-3 rounded-2xl"><span id="seconds" class="font-bold text-2xl sm:text-3xl text-yellow-400">00</span><p class="text-[10px] uppercase">Giây</p></div>
-                </div>
-            </section>
+        <!-- 2. DRAWER BACKDROP (#drawerBackdrop) & SIDE DRAWER (#sideDrawer) -->
+        <div id="drawerBackdrop" aria-hidden="true"></div>
 
-            <!-- Grid Chức Năng & Bảng Vàng & Chat (Bố cục tự co giãn full màn hình linh hoạt) -->
-            <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Điểm Danh -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
-                        <div>
-                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-calendar-check"></i></div>
-                            <h3 class="font-serif text-lg font-bold text-yellow-300">Điểm Danh</h3>
+        <aside id="sideDrawer" aria-label="Menu điều hướng ngăn kéo">
+            <div class="p-5 overflow-y-auto space-y-5">
+                <!-- Drawer Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <polygon points="12 2 19 8.5 15.5 21 8.5 21 5 8.5 12 2"></polygon>
+                            </svg>
                         </div>
-                        <div id="checkinStatusBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Chưa điểm danh...</div>
-                        <button id="checkinBtn" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Điểm Danh Ngay</button>
-                    </section>
-                    <!-- Rút Quẻ -->
-                    <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
-                            <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300 text-xl"><i class="fa-solid fa-box-archive"></i></div>
-                            <h3 class="font-serif text-lg font-bold text-yellow-300">Rút Quẻ</h3>
+                            <div class="font-gaming font-extrabold text-lg text-white tracking-wider">MENU CHÍNH</div>
+                            <div class="text-[11px] text-gray-400">Chọn mục cần mở</div>
                         </div>
-                        <div id="queResultBox" class="my-2 p-2 rounded-lg bg-red-950/80 text-yellow-200 text-[11px] italic">Thỉnh quẻ đầu năm...</div>
-                        <button id="rutQueBtn" class="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold uppercase text-[11px] cursor-pointer shadow-md transition">Rút Quẻ Ngay</button>
-                    </section>
+                    </div>
+
+                    <button
+                        id="closeDrawerBtn"
+                        type="button"
+                        aria-label="Đóng menu ngăn kéo"
+                        class="w-9 h-9 rounded-lg bg-white/5 hover:bg-red-600/25 border border-white/10 hover:border-red-500/40 text-gray-300 hover:text-white flex items-center justify-center cursor-pointer"
+                    >
+                        <svg class="w-5 h-5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Separate Screen Navigation Items -->
+                <div class="space-y-2">
+                    <button type="button" onclick="navigateToScreen('cay-thue')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-red-950/50 border border-white/10 hover:border-red-500/40 transition-all flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                <!-- Custom SVG Lightning Icon -->
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="font-bold text-sm text-white">Cày Thuê</div>
+                                <div class="text-[11px] text-gray-400">Max Lv 20k • Trái Full 15k</div>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-500 group-hover:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+
+                    <button type="button" onclick="navigateToScreen('ho-tro')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-cyan-950/40 border border-white/10 hover:border-cyan-500/40 transition-all flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-cyan-600/20 text-cyan-400 flex items-center justify-center group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                                <!-- Custom SVG Headset Icon -->
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="font-bold text-sm text-white">Hỗ Trợ</div>
+                                <div class="text-[11px] text-gray-400">Gửi báo cáo &amp; khiếu nại</div>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-500 group-hover:text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+
+                    <button type="button" onclick="navigateToScreen('lich-su')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-amber-950/40 border border-white/10 hover:border-amber-500/40 transition-all flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-amber-600/20 text-amber-400 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                                <!-- Custom SVG Clock History Icon -->
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="9"></circle>
+                                    <polyline points="12 7 12 12 15 15"></polyline>
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="font-bold text-sm text-white">Lịch Sử Đơn</div>
+                                <div class="text-[11px] text-gray-400">Đơn cày thuê đã đặt</div>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-500 group-hover:text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+
+                    <button type="button" onclick="navigateToScreen('tai-khoan')" class="w-full text-left px-3.5 py-3 rounded-xl bg-cosmic-900 hover:bg-purple-950/40 border border-white/10 hover:border-purple-500/40 transition-all flex items-center justify-between cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-lg bg-purple-600/20 text-purple-400 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                <!-- Custom SVG User Icon -->
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+ ection>
                     <!-- Ủng Hộ -->
                     <section class="glass-card rounded-3xl p-5 border border-yellow-500/40 flex flex-col justify-between text-center min-h-[180px]">
                         <div>
